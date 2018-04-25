@@ -27,19 +27,19 @@ class Model(object):
         nact = ac_space.n
         nbatch = nenvs*nsteps
 
-        A = tf.placeholder(tf.int32, [nbatch])
+        A = tf.placeholder(tf.int32, [nbatch]) # action label
         ADV = tf.placeholder(tf.float32, [nbatch])
         R = tf.placeholder(tf.float32, [nbatch])
         LR = tf.placeholder(tf.float32, [])
 
-        step_model = policy(sess, ob_space, ac_space, nenvs, 1, reuse=False)
+        step_model = policy(sess, ob_space, ac_space, nenvs, nsteps=1, reuse=False)
         train_model = policy(sess, ob_space, ac_space, nenvs*nsteps, nsteps, reuse=True)
 
         neglogpac = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=train_model.pi, labels=A)
         pg_loss = tf.reduce_mean(ADV * neglogpac)
         vf_loss = tf.reduce_mean(mse(tf.squeeze(train_model.vf), R))
         entropy = tf.reduce_mean(cat_entropy(train_model.pi))
-        loss = pg_loss - entropy*ent_coef + vf_loss * vf_coef
+        loss = pg_loss - entropy*ent_coef + vf_loss*vf_coef
 
         params = find_trainable_variables("model")
         grads = tf.gradients(loss, params)
@@ -146,14 +146,16 @@ class Runner(object):
         return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values
 
 def learn(policy, env, seed, nsteps=5, total_timesteps=int(80e6), vf_coef=0.5, ent_coef=0.01, max_grad_norm=0.5, lr=7e-4, lrschedule='linear', epsilon=1e-5, alpha=0.99, gamma=0.99, log_interval=100):
-    tf.reset_default_graph()
-    set_global_seeds(seed)
+    tf.reset_default_graph() # Clears the default graph stack and resets the global default graph.
+    set_global_seeds(seed) # including tf, numpy, python's random
 
     nenvs = env.num_envs
-    ob_space = env.observation_space
-    ac_space = env.action_space
+    ob_space = env.observation_space # shape: (84, 84, 4)
+    ac_space = env.action_space # shape: ()
+
     model = Model(policy=policy, ob_space=ob_space, ac_space=ac_space, nenvs=nenvs, nsteps=nsteps, ent_coef=ent_coef, vf_coef=vf_coef,
         max_grad_norm=max_grad_norm, lr=lr, alpha=alpha, epsilon=epsilon, total_timesteps=total_timesteps, lrschedule=lrschedule)
+
     runner = Runner(env, model, nsteps=nsteps, gamma=gamma)
 
     nbatch = nenvs*nsteps
