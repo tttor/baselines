@@ -7,13 +7,21 @@ from baselines.a2c.a2c import learn
 from baselines.ppo2.policies import CnnPolicy, LstmPolicy, LnLstmPolicy
 
 def train(env_id, num_timesteps, seed, policy, lrschedule, num_env):
+    print(env_id)
+    print(num_timesteps)
+    print(seed)
+    print(policy)
+    print(lrschedule)
+    print(num_env)
+
     if policy == 'cnn':
         policy_fn = CnnPolicy
     elif policy == 'lstm':
         policy_fn = LstmPolicy
     elif policy == 'lnlstm':
         policy_fn = LnLstmPolicy
-    env = VecFrameStack(make_atari_env(env_id, num_env, seed), 4)
+
+    env = VecFrameStack(make_atari_env(env_id, num_env, seed), nstack=4)
     learn(policy_fn, env, seed, total_timesteps=int(num_timesteps * 1.1), lrschedule=lrschedule)
     env.close()
 
