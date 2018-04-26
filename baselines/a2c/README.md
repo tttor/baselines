@@ -21,6 +21,7 @@
   * nh: number of rows (h: height)
   * nw: number of column (w: width)
   * nc: number of channels
+* `mb_foo`: mini batch of foo
 
 ## fact
 * term "model" includes "env"
@@ -29,10 +30,13 @@
 * nsteps in policy() is only used in LSTM policy
 * need to switch to ppo1 for multi CPU
 * `nupdates = total_timesteps//nbatch+1`
+  * learning is done in batch, `batchsize = nenvs*nsteps`
 
 ## question
 * nsteps  vs total_timesteps
-  * alwyas used the default `nsteps= 5`
+  * alwyas used the default `nsteps= 5`, why?
+  * the target for learning is not nepisodes but total_timesteps?
+  * nsteps here refers to nsteps per batch
 
 * python -m baselines.a2c.run_atari does use all cpus
   * is it from the tensorflow only?
@@ -50,3 +54,13 @@
 
 * in /home/tor/ws-fork/baselines@tttor/baselines/a2c/utils.py
   * fc().... stands for? forwad prop? forward pass?
+
+* where is return calculated?
+
+* in Runner::run(): `return mb_obs, mb_states...`, obs vs states
+
+* model.step() vs env.step()
+  * model.step(): step fwd (fwd propagate) the policy
+    * output: actions, values, states
+  * env.step(): step the environment
+    * output: obs, rewards, dones

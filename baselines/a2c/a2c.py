@@ -104,20 +104,26 @@ class Runner(object):
         self.dones = [False for _ in range(nenv)]
 
     def run(self):
+        print('Runner::run(): begin')
         mb_obs, mb_rewards, mb_actions, mb_values, mb_dones = [],[],[],[],[]
         mb_states = self.states
-        for n in range(self.nsteps):
+
+        for step_idx in range(self.nsteps):
             actions, values, states, _ = self.model.step(self.obs, self.states, self.dones)
-            mb_obs.append(np.copy(self.obs))
             mb_actions.append(actions)
             mb_values.append(values)
+            mb_obs.append(np.copy(self.obs))
             mb_dones.append(self.dones)
+            # print(str(actions.shape)) # shape= (nenvs,)
+
             obs, rewards, dones, _ = self.env.step(actions)
             self.states = states
             self.dones = dones
+
             for n, done in enumerate(dones):
                 if done:
                     self.obs[n] = self.obs[n]*0
+
             self.obs = obs
             mb_rewards.append(rewards)
         mb_dones.append(self.dones)
@@ -146,6 +152,8 @@ class Runner(object):
         mb_values = mb_values.flatten()
         mb_masks = mb_masks.flatten()
 
+        assert (mb_states is None) # now: not use LTSM; only LSTM-based policies consider state
+        print('Runner::run(): end')
         return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values
 
 def learn(policy, env, seed, nsteps=5, total_timesteps=int(80e6), vf_coef=0.5, ent_coef=0.01, max_grad_norm=0.5, lr=7e-4, lrschedule='linear', epsilon=1e-5, alpha=0.99, gamma=0.99, log_interval=100):
