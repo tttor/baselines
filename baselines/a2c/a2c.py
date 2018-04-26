@@ -128,7 +128,7 @@ class Runner(object):
             mb_rewards.append(rewards)
         mb_dones.append(self.dones)
 
-        #batch of steps to batch of rollouts
+        ## batch of steps to batch of rollouts
         mb_obs = np.asarray(mb_obs, dtype=np.uint8).swapaxes(1, 0).reshape(self.batch_ob_shape)
         mb_rewards = np.asarray(mb_rewards, dtype=np.float32).swapaxes(1, 0)
         mb_actions = np.asarray(mb_actions, dtype=np.int32).swapaxes(1, 0)
@@ -138,7 +138,7 @@ class Runner(object):
         mb_dones = mb_dones[:, 1:]
         last_values = self.model.value(self.obs, self.states, self.dones).tolist()
 
-        #discount/bootstrap off value fn
+        ## discount/bootstrap off value fn
         for n, (rewards, dones, value) in enumerate(zip(mb_rewards, mb_dones, last_values)):
             rewards = rewards.tolist()
             dones = dones.tolist()
@@ -147,12 +147,13 @@ class Runner(object):
             else:
                 rewards = discount_with_dones(rewards, dones, self.gamma)
             mb_rewards[n] = rewards
+
         mb_rewards = mb_rewards.flatten()
         mb_actions = mb_actions.flatten()
         mb_values = mb_values.flatten()
         mb_masks = mb_masks.flatten()
-
         assert (mb_states is None) # now: not use LTSM; only LSTM-based policies consider state
+
         print('Runner::run(): end')
         return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values
 

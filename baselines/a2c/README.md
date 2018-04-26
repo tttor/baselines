@@ -56,6 +56,7 @@
   * fc().... stands for? forwad prop? forward pass?
 
 * where is return calculated?
+  * related to `discount_with_dones()`
 
 * in Runner::run(): `return mb_obs, mb_states...`, obs vs states
 
@@ -64,3 +65,6 @@
     * output: actions, values, states
   * env.step(): step the environment
     * output: obs, rewards, dones
+
+* why should we train nets in a batch?
+  * ans: https://datascience.stackexchange.com/questions/16807/why-mini-batch-size-is-better-than-one-single-batch-with-all-training-data
