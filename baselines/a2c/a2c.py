@@ -53,16 +53,22 @@ class Model(object):
 
         def train(obs, states, rewards, masks, actions, values):
             advs = rewards - values
+
             for step in range(len(obs)):
                 cur_lr = lr.value()
+
             td_map = {train_model.X:obs, A:actions, ADV:advs, R:rewards, LR:cur_lr}
-            if states is not None:
-                td_map[train_model.S] = states
-                td_map[train_model.M] = masks
+
+            assert (states is None)
+            # if states is not None:
+            #     td_map[train_model.S] = states
+            #     td_map[train_model.M] = masks
+
             policy_loss, value_loss, policy_entropy, _ = sess.run(
                 [pg_loss, vf_loss, entropy, _train],
                 td_map
             )
+
             return policy_loss, value_loss, policy_entropy
 
         def save(save_path):
