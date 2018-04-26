@@ -142,6 +142,8 @@ class Runner(object):
         for n, (rewards, dones, value) in enumerate(zip(mb_rewards, mb_dones, last_values)):
             rewards = rewards.tolist()
             dones = dones.tolist()
+            print(str(rewards))
+            print(str(dones))
             if dones[-1] == 0:
                 rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
             else:
@@ -193,7 +195,7 @@ def learn(policy, env, seed, nsteps, total_timesteps, vf_coef=0.5, ent_coef=0.01
         if update_idx % log_interval == 0 or update_idx == 1:
             ev = explained_variance(values, rewards)
             logger.record_tabular("update_idx", update_idx)
-            logger.record_tabular("total_timesteps", update_idx*batchsize)
+            logger.record_tabular("total_steps", update_idx*batchsize)
             logger.record_tabular("fps", fps)
             logger.record_tabular("policy_loss", float(policy_loss))
             logger.record_tabular("policy_entropy", float(policy_entropy))
