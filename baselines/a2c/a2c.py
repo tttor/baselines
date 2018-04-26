@@ -89,7 +89,7 @@ class Model(object):
 
 class Runner(object):
 
-    def __init__(self, env, model, nsteps=5, gamma=0.99):
+    def __init__(self, env, model, nsteps, gamma):
         self.env = env
         self.model = model
         nh, nw, nc = env.observation_space.shape
