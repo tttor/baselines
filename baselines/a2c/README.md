@@ -42,6 +42,7 @@
   * is it from the tensorflow only?
   * where is the parallel actor made/called?
     * something todo with `nenvs`, which is set to 16
+    * there may be no need to paralle the env.step() becuase it is cheap
 
 * in model class, why passing:
   * reuse=False, in step_model, but
@@ -53,7 +54,7 @@
   * why plus vf_loss
 
 * in /home/tor/ws-fork/baselines@tttor/baselines/a2c/utils.py
-  * fc().... stands for? forwad prop? forward pass?
+  * fc().... stands for? forwad prop? forward pass? fully connected?
 
 * where is return calculated?
   * related to `discount_with_dones()`
