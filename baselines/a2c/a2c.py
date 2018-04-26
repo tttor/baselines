@@ -156,25 +156,42 @@ def learn(policy, env, seed, nsteps=5, total_timesteps=int(80e6), vf_coef=0.5, e
     ob_space = env.observation_space # shape: (84, 84, 4)
     ac_space = env.action_space # shape: ()
 
-    model = Model(policy=policy, ob_space=ob_space, ac_space=ac_space, nenvs=nenvs, nsteps=nsteps, ent_coef=ent_coef, vf_coef=vf_coef,
-        max_grad_norm=max_grad_norm, lr=lr, alpha=alpha, epsilon=epsilon, total_timesteps=total_timesteps, lrschedule=lrschedule)
+    model = Model(policy=policy, ob_space=ob_space, ac_space=ac_space, nenvs=nenvs,
+                nsteps=nsteps, ent_coef=ent_coef, vf_coef=vf_coef,
+                max_grad_norm=max_grad_norm, lr=lr, alpha=alpha, epsilon=epsilon,
+                total_timesteps=total_timesteps, lrschedule=lrschedule)
 
     runner = Runner(env, model, nsteps=nsteps, gamma=gamma)
 
-    nbatch = nenvs*nsteps
+    batchsize = nenvs*nsteps
+    nupdates = total_timesteps//batchsize+1
+    print('nsteps= '+str(nsteps))
+    print('batchsize= '+str(batchsize))
+    print('total_timesteps= '+str(total_timesteps))
+    print('nupdates= '+str(nupdates))
+
     tstart = time.time()
-    for update in range(1, total_timesteps//nbatch+1):
+    for update_idx in range(1, nupdates):
+        ## run step
         obs, states, rewards, masks, actions, values = runner.run()
+
+        ## train
         policy_loss, value_loss, policy_entropy = model.train(obs, states, rewards, masks, actions, values)
+
+        ## log
         nseconds = time.time()-tstart
-        fps = int((update*nbatch)/nseconds)
-        if update % log_interval == 0 or update == 1:
+        fps = int((update_idx*batchsize)/nseconds)
+        if update_idx % log_interval == 0 or update_idx == 1:
             ev = explained_variance(values, rewards)
-            logger.record_tabular("nupdates", update)
-            logger.record_tabular("total_timesteps", update*nbatch)
+            logger.record_tabular("update_idx", update_idx)
+            logger.record_tabular("total_timesteps", update_idx*batchsize)
             logger.record_tabular("fps", fps)
+            logger.record_tabular("policy_loss", float(policy_loss))
             logger.record_tabular("policy_entropy", float(policy_entropy))
             logger.record_tabular("value_loss", float(value_loss))
             logger.record_tabular("explained_variance", float(ev))
             logger.dump_tabular()
+
+        break
+
     env.close()

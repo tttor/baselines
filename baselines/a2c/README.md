@@ -2,7 +2,9 @@
 
 - Original paper: https://arxiv.org/abs/1602.01783
 - Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
-- `python -m baselines.a2c.run_atari` runs the algorithm for 40M frames = 10M timesteps on an Atari game. See help (`-h`) for more options.
+- `python -m baselines.a2c.run_atari`
+  runs the algorithm for 40M frames = 10M timesteps on an Atari game.
+  See help (`-h`) for more options.
 
 ## setup
 * python 3.5.2
@@ -26,6 +28,7 @@
 * `nbatch = nenvs*nsteps`
 * nsteps in policy() is only used in LSTM policy
 * need to switch to ppo1 for multi CPU
+* `nupdates = total_timesteps//nbatch+1`
 
 ## question
 * nsteps  vs total_timesteps
