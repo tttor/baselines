@@ -154,12 +154,14 @@ class Runner(object):
         mb_actions = mb_actions.flatten()
         mb_values = mb_values.flatten()
         mb_masks = mb_masks.flatten()
-        assert (mb_states is None) # now: not use LTSM; only LSTM-based policies consider state
+        assert (mb_states is None) # now: not to use LTSM; only LSTM-based policies consider state
 
         print('Runner::run(): end')
         return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values
 
-def learn(policy, env, seed, nsteps, total_timesteps, vf_coef=0.5, ent_coef=0.01, max_grad_norm=0.5, lr=7e-4, lrschedule='linear', epsilon=1e-5, alpha=0.99, gamma=0.99, log_interval=100):
+def learn(policy, env, seed, nsteps, total_timesteps, vf_coef=0.5, ent_coef=0.01,
+          max_grad_norm=0.5, lr=7e-4, lrschedule='linear', epsilon=1e-5, alpha=0.99,
+          gamma=0.99, log_interval=100):
     tf.reset_default_graph() # Clears the default graph stack and resets the global default graph.
     set_global_seeds(seed) # including tf, numpy, python's random
 
