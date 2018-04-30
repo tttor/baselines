@@ -7,8 +7,9 @@
   See help (`-h`) for more options.
 
 ## setup
-* python 3.5.2
-  * using python 3.6x causes problem in installing mpi4py
+* `sudo apt-get update && sudo apt-get install cmake libopenmpi-dev python3-dev zlib1g-dev`
+  * work if using Python 3.5.2
+  * does not work if using Python 3.6.x; problem in installing mpi4py
 * `pip3 install opencv-python`
   * https://stackoverflow.com/questions/43019951/after-install-ros-kinetic-cannot-import-opencv
   * https://github.com/ros-perception/vision_opencv/issues/196
@@ -22,6 +23,9 @@
   * nw: number of column (w: width)
   * nc: number of channels
 * `mb_foo`: mini batch of foo
+* adv: advantge
+* vf: value function
+* lr: learning rate
 
 ## fact
 * term "model" includes "env"
@@ -58,6 +62,16 @@
 
 * where is return calculated?
   * related to `discount_with_dones()`
+  * seems this is general reward formulation, not adjusted to pong
+  * `r = reward + gamma*r*(1.-done)`
+    * done==True==1 then it is terminal state
+```
+if dones[-1] == False:
+  rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
+else:
+  rewards = discount_with_dones(rewards, dones, self.gamma)
+
+```
 
 * in Runner::run(): `return mb_obs, mb_states...`, obs vs states
 
@@ -69,3 +83,6 @@
 
 * why should we train nets in a batch?
   * ans: https://datascience.stackexchange.com/questions/16807/why-mini-batch-size-is-better-than-one-single-batch-with-all-training-data
+
+## misc
+
