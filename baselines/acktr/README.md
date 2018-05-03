@@ -5,7 +5,7 @@
 - runs the algorithm for 40M frames = 10M timesteps on an Atari game. See help (`-h`) for more options.
   * `python -m baselines.acktr.run_atari`
 
-## env setup
+## env setup (Python 3.5.2, 3.6.5)
 * sudo apt-get install python3.6-dev
 * sudo apt-get install libosmesa6-dev
 * sudo curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf
