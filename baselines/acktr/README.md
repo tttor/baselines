@@ -20,3 +20,12 @@ sudo chmod +x /usr/local/bin/patchelf
   * https://github.com/openai/mujoco-py/issues/47
   * https://github.com/openai/mujoco-py/issues/96
     * https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory
+
+## breakdown
+* policy network: Gaussian MLP
+* value network: ?
+
+## abbreviation
+* kl_div: Kullback-Leibler divergence
+* wd_dict: weight data dictionary
+* ob_no: ?

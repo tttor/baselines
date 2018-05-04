@@ -19,6 +19,7 @@ def main():
         ac_dim = env.action_space.shape[0]
         print('ob_dim= '+str(ob_dim))
         print('ac_dim= '+str(ac_dim))
+        print('env.spec.timestep_limit= '+str(env.spec.timestep_limit))
 
         with tf.variable_scope("vf"):
             vf = NeuralNetValueFunction(ob_dim, ac_dim)
