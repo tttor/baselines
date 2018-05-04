@@ -24,13 +24,17 @@ sudo chmod +x /usr/local/bin/patchelf
 ## breakdown
 * policy network: Gaussian MLP
 * value network: ?
+* standard reacher has frameskip(timestep skip)= 2
+* reacher ob.shape= 11
 
 ## abbreviation
 * kl_div: Kullback-Leibler divergence
 * wd_dict: weight data dictionary
 * ob_no: ?
+* com: center of mass
 
 ## question
 * loss vs loss_sampled?
 * global seed?
 * reacher: to always have the same initial joint pos and target pose?
+  * diff seed make diff target pose, but still not init jointpos

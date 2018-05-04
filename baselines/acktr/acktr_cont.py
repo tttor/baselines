@@ -24,10 +24,6 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
     rewards = []
 
     for _ in range(max_pathlength):
-        if render:
-            env.render()
-            time.sleep(0.100)
-
         ## get obs
         state = np.concatenate([ob, prev_ob], -1)
         obs.append(state)
@@ -42,11 +38,8 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
         scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
 
-        print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
-
         ## step
-        ob, rew, done, _ = env.step(scaled_ac)
-        print('rew= %f' % rew)
+        ob, rew, done, info = env.step(scaled_ac)
 
         rewards.append(rew)
         if obfilter:
@@ -54,6 +47,13 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
         if done:
             terminated = True
             break
+
+        if render:
+            print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
+            print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
+            # print(str(ob))
+            env.render()
+            time.sleep(0.100)
 
     return {"observation" : np.array(obs), "terminated" : terminated,
             "reward" : np.array(rewards), "action" : np.array(acs),
