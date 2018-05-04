@@ -78,19 +78,17 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         assert (qr != None)
         enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
-    iter_idx = 0
+    batch_idx = 0
     timesteps_so_far = 0
-    while True:
-        if timesteps_so_far > num_timesteps:
-            break
-        logger.log("********** Learning Iteration % i ************"%iter_idx)
+    while (timesteps_so_far < num_timesteps):
+        logger.log("********** batch_idx= %i ************"%batch_idx)
 
-        # Collect paths until we have enough timesteps
+        # Collect paths until we have enough timesteps for this batch
         timesteps_this_batch = 0
         paths = []
         while True:
             path = rollout(env, policy, max_pathlength,
-                           render=(len(paths)==0 and (iter_idx % 10 == 0) and animate),
+                           render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
                            obfilter=obfilter)
 
             paths.append(path)
@@ -147,7 +145,7 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
 
         if callback: callback()
         logger.dump_tabular()
-        iter_idx += 1
+        batch_idx += 1
 
     coord.request_stop()
     coord.join(enqueue_threads)
