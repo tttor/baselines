@@ -33,3 +33,4 @@ sudo chmod +x /usr/local/bin/patchelf
 ## question
 * loss vs loss_sampled?
 * global seed?
+* reacher: to always have the same initial joint pos and target pose?

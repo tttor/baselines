@@ -1,7 +1,10 @@
+import time
+
 import numpy as np
 import tensorflow as tf
-from baselines import logger
+
 import baselines.common as common
+from baselines import logger
 from baselines.common import tf_util as U
 from baselines.acktr import kfac
 from baselines.acktr.filters import ZFilter
@@ -21,7 +24,9 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
     rewards = []
 
     for _ in range(max_pathlength):
-        if render: env.render()
+        if render:
+            env.render()
+            time.sleep(0.100)
 
         ## get obs
         state = np.concatenate([ob, prev_ob], -1)
@@ -37,8 +42,11 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
         scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
 
+        print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
+
         ## step
         ob, rew, done, _ = env.step(scaled_ac)
+        print('rew= %f' % rew)
 
         rewards.append(rew)
         if obfilter:
@@ -88,7 +96,8 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         paths = []
         while True:
             path = rollout(env, policy, max_pathlength,
-                           render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
+                           # render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
+                           render=True,
                            obfilter=obfilter)
 
             paths.append(path)
@@ -97,6 +106,8 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
             timesteps_so_far += n
             if timesteps_this_batch > timesteps_per_batch:
                 break
+
+            return
 
         # Estimate advantage function
         vtargs = []
