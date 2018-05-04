@@ -2,8 +2,11 @@
 
 - Original paper: https://arxiv.org/abs/1708.05144
 - Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
-- runs the algorithm for 40M frames = 10M timesteps on an Atari game. See help (`-h`) for more options.
+- runs the algorithm for 40M frames = 10M timesteps on an Atari game.
+  See help (`-h`) for more options.
   * `python -m baselines.acktr.run_atari`
+- runs in mujoco env
+  * `python -m baselines.acktr.run_mujoco --env Reacher-v2 --seed 0 --num-timesteps 1000`
 
 ## env setup (Python 3.5.2, 3.6.5)
 * sudo apt-get install python3.6-dev
