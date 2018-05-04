@@ -6,10 +6,7 @@ from baselines.common import tf_util as U
 from baselines.acktr import kfac
 from baselines.acktr.filters import ZFilter
 
-def pathlength(path):
-    return path["reward"].shape[0]# Loss function that we'll differentiate to get the policy gradient
-
-def rollout(env, policy, max_pathlength, animate=False, obfilter=None):
+def rollout(env, policy, max_pathlength, render=False, obfilter=None):
     """
     Simulate the env and policy for max_pathlength steps
     """
@@ -24,7 +21,7 @@ def rollout(env, policy, max_pathlength, animate=False, obfilter=None):
     rewards = []
 
     for _ in range(max_pathlength):
-        if animate: env.render()
+        if render: env.render()
 
         ## get obs
         state = np.concatenate([ob, prev_ob], -1)
@@ -55,7 +52,7 @@ def rollout(env, policy, max_pathlength, animate=False, obfilter=None):
             "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
 
 def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
-    animate=False, callback=None, desired_kl=0.002):
+          animate=False, callback=None, desired_kl=0.002):
 
     obfilter = ZFilter(env.observation_space.shape)
     max_pathlength = env.spec.timestep_limit
@@ -93,11 +90,11 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         paths = []
         while True:
             path = rollout(env, policy, max_pathlength,
-                           animate=(len(paths)==0 and (i % 10 == 0) and animate),
+                           render=(len(paths)==0 and (i % 10 == 0) and animate),
                            obfilter=obfilter)
 
             paths.append(path)
-            n = pathlength(path)
+            n = _pathlength(path)
             timesteps_this_batch += n
             timesteps_so_far += n
             if timesteps_this_batch > timesteps_per_batch:
@@ -145,7 +142,7 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
 
         logger.record_tabular("EpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("EpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
-        logger.record_tabular("EpLenMean", np.mean([pathlength(path) for path in paths]))
+        logger.record_tabular("EpLenMean", np.mean([_pathlength(path) for path in paths]))
         logger.record_tabular("KL", kl)
 
         if callback: callback()
@@ -154,3 +151,6 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
 
     coord.request_stop()
     coord.join(enqueue_threads)
+
+def _pathlength(path):
+    return path["reward"].shape[0]# Loss function that we'll differentiate to get the policy gradient
