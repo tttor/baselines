@@ -29,3 +29,7 @@ sudo chmod +x /usr/local/bin/patchelf
 * kl_div: Kullback-Leibler divergence
 * wd_dict: weight data dictionary
 * ob_no: ?
+
+## question
+* loss vs loss_sampled?
+* global seed?

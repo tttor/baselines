@@ -17,30 +17,39 @@ def rollout(env, policy, max_pathlength, animate=False, obfilter=None):
     prev_ob = np.float32(np.zeros(ob.shape))
     if obfilter: ob = obfilter(ob)
     terminated = False
-
     obs = []
     acs = []
     ac_dists = []
     logps = []
     rewards = []
+
     for _ in range(max_pathlength):
-        if animate:
-            env.render()
+        if animate: env.render()
+
+        ## get obs
         state = np.concatenate([ob, prev_ob], -1)
         obs.append(state)
+        prev_ob = np.copy(ob)
+
+        ## get action
         ac, ac_dist, logp = policy.act(state)
         acs.append(ac)
         ac_dists.append(ac_dist)
         logps.append(logp)
-        prev_ob = np.copy(ob)
+
         scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
+
+        ## step
         ob, rew, done, _ = env.step(scaled_ac)
-        if obfilter: ob = obfilter(ob)
+
         rewards.append(rew)
+        if obfilter:
+            ob = obfilter(ob)
         if done:
             terminated = True
             break
+
     return {"observation" : np.array(obs), "terminated" : terminated,
             "reward" : np.array(rewards), "action" : np.array(acs),
             "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
@@ -70,7 +79,7 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
     coord = tf.train.Coordinator()
     for qr in [q_runner, vf.q_runner]:
         assert (qr != None)
-        enqueue_threads.extend(qr.create_threads(tf.get_default_session(), coord=coord, start=True))
+        enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
     i = 0
     timesteps_so_far = 0
@@ -83,7 +92,10 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         timesteps_this_batch = 0
         paths = []
         while True:
-            path = rollout(env, policy, max_pathlength, animate=(len(paths)==0 and (i % 10 == 0) and animate), obfilter=obfilter)
+            path = rollout(env, policy, max_pathlength,
+                           animate=(len(paths)==0 and (i % 10 == 0) and animate),
+                           obfilter=obfilter)
+
             paths.append(path)
             n = pathlength(path)
             timesteps_this_batch += n
