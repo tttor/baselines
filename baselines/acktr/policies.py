@@ -11,7 +11,8 @@ class GaussianMlpPolicy(object):
         # Variables specific to (1) have the word "sampled" in them,
         # whereas variables specific to (2) have the word "old" in them
 
-        ob_no = tf.placeholder(tf.float32, shape=[None, ob_dim*2], name="ob") # batch of observations, why *2?
+        # ob_no, oldac_dist are multiplied by 2 because [ob, prev_ob] are concatenated
+        ob_no = tf.placeholder(tf.float32, shape=[None, ob_dim*2], name="ob") # batch of observations
         oldac_na = tf.placeholder(tf.float32, shape=[None, ac_dim], name="ac") # batch of actions: previous actions
         oldac_dist = tf.placeholder(tf.float32, shape=[None, ac_dim*2], name="oldac_dist") # batch of actions: previous action distributions
         adv_n = tf.placeholder(tf.float32, shape=[None], name="adv") # advantage function estimate
