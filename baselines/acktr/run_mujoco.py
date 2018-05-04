@@ -29,7 +29,7 @@ def main():
         acktr_cont.learn(env,
                          policy=policy, vf=vf,
                          gamma=0.99, lam=0.97,
-                         timesteps_per_batch=2500,
+                         batch_size=2500,# in nsteps
                          max_nsteps=args.num_timesteps,
                          desired_kl=0.002,
                          animate=False)

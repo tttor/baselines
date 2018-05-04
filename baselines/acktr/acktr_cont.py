@@ -59,7 +59,7 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
             "reward" : np.array(rewards), "action" : np.array(acs),
             "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
 
-def learn(env, policy, vf, gamma, lam, timesteps_per_batch, max_nsteps,
+def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
           animate=False, callback=None, desired_kl=0.002):
 
     obfilter = ZFilter(env.observation_space.shape)
@@ -104,7 +104,7 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, max_nsteps,
             n = _pathlength(path)
             timesteps_this_batch += n
             total_nsteps += n
-            if timesteps_this_batch > timesteps_per_batch:
+            if timesteps_this_batch > batch_size:
                 break
 
         # Estimate advantage function
