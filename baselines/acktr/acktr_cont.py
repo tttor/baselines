@@ -88,13 +88,13 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
 
     batch_idx = 0
     total_nsteps = 0
-    while (total_nsteps < max_nsteps):
+    while total_nsteps < max_nsteps:
         logger.log("********** batch_idx= %i ************"%batch_idx)
 
         # Collect paths until we have enough timesteps for this batch
-        timesteps_this_batch = 0
+        nsteps = 0
         paths = []
-        while True:
+        while nsteps < batch_size:
             path = rollout(env, policy, max_pathlength,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
                            # render=True,
@@ -102,10 +102,8 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
 
             paths.append(path)
             n = _pathlength(path)
-            timesteps_this_batch += n
+            nsteps += n
             total_nsteps += n
-            if timesteps_this_batch > batch_size:
-                break
 
         # Estimate advantage function
         vtargs = []
