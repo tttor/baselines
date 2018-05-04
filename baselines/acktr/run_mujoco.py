@@ -3,7 +3,7 @@
 import tensorflow as tf
 from baselines import logger
 from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
-from baselines.acktr.acktr_cont import learn
+from baselines.acktr import acktr_cont
 from baselines.acktr.policies import GaussianMlpPolicy
 from baselines.acktr.value_functions import NeuralNetValueFunction
 
@@ -25,10 +25,11 @@ def main():
         with tf.variable_scope("pi"):
             policy = GaussianMlpPolicy(ob_dim, ac_dim)
 
-        learn(env, policy=policy, vf=vf,
-            gamma=0.99, lam=0.97, timesteps_per_batch=2500,
-            desired_kl=0.002,
-            num_timesteps=args.num_timesteps, animate=False)
+        acktr_cont.learn(env, policy=policy, vf=vf,
+                         gamma=0.99, lam=0.97, timesteps_per_batch=2500,
+                         desired_kl=0.002,
+                         num_timesteps=args.num_timesteps,
+                         animate=False)
 
     env.close()
 
