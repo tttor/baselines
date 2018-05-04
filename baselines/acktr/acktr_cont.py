@@ -51,9 +51,9 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
     obfilter = ZFilter(env.observation_space.shape)
 
     max_pathlength = env.spec.timestep_limit
-    stepsize = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize')
+    lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
     inputs, loss, loss_sampled = policy.update_info
-    optim = kfac.KfacOptimizer(learning_rate=stepsize, cold_lr=stepsize*(1-0.9), momentum=0.9, kfac_update=2,\
+    optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,\
                                 epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
                                 weight_decay_dict=policy.wd_dict, max_grad_norm=None)
     pi_var_list = []
@@ -103,6 +103,7 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
             delta_t = rew_t + gamma*vpred_t[1:] - vpred_t[:-1]
             adv_t = common.discount(delta_t, gamma * lam)
             advs.append(adv_t)
+
         # Update value function
         vf.fit(paths, vtargs)
 
@@ -116,16 +117,17 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         # Policy update
         do_update(ob_no, action_na, standardized_adv_n)
 
-        min_stepsize = np.float32(1e-8)
-        max_stepsize = np.float32(1e0)
-        # Adjust stepsize
+        min_lr = np.float32(1e-8)
+        max_lr = np.float32(1e0)
+
+        # Adjust lr
         kl = policy.compute_kl(ob_no, oldac_dist)
         if kl > desired_kl * 2:
             logger.log("kl too high")
-            tf.assign(stepsize, tf.maximum(min_stepsize, stepsize / 1.5)).eval()
+            tf.assign(lr, tf.maximum(min_lr, lr / 1.5)).eval()
         elif kl < desired_kl / 2:
             logger.log("kl too low")
-            tf.assign(stepsize, tf.minimum(max_stepsize, stepsize * 1.5)).eval()
+            tf.assign(lr, tf.minimum(max_lr, lr * 1.5)).eval()
         else:
             logger.log("kl just right!")
 
@@ -133,8 +135,8 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         logger.record_tabular("EpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
         logger.record_tabular("EpLenMean", np.mean([pathlength(path) for path in paths]))
         logger.record_tabular("KL", kl)
-        if callback:
-            callback()
+
+        if callback: callback()
         logger.dump_tabular()
         i += 1
 

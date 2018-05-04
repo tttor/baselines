@@ -25,10 +25,12 @@ def main():
         with tf.variable_scope("pi"):
             policy = GaussianMlpPolicy(ob_dim, ac_dim)
 
-        acktr_cont.learn(env, policy=policy, vf=vf,
-                         gamma=0.99, lam=0.97, timesteps_per_batch=2500,
-                         desired_kl=0.002,
+        acktr_cont.learn(env,
+                         policy=policy, vf=vf,
+                         gamma=0.99, lam=0.97,
+                         timesteps_per_batch=2500,
                          num_timesteps=args.num_timesteps,
+                         desired_kl=0.002,
                          animate=False)
 
     env.close()
