@@ -59,7 +59,7 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
             "reward" : np.array(rewards), "action" : np.array(acs),
             "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
 
-def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
+def learn(env, policy, vf, gamma, lam, timesteps_per_batch, max_nsteps,
           animate=False, callback=None, desired_kl=0.002):
 
     obfilter = ZFilter(env.observation_space.shape)
@@ -87,8 +87,8 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
     batch_idx = 0
-    timesteps_so_far = 0
-    while (timesteps_so_far < num_timesteps):
+    total_nsteps = 0
+    while (total_nsteps < max_nsteps):
         logger.log("********** batch_idx= %i ************"%batch_idx)
 
         # Collect paths until we have enough timesteps for this batch
@@ -96,18 +96,16 @@ def learn(env, policy, vf, gamma, lam, timesteps_per_batch, num_timesteps,
         paths = []
         while True:
             path = rollout(env, policy, max_pathlength,
-                           # render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
-                           render=True,
+                           render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
+                           # render=True,
                            obfilter=obfilter)
 
             paths.append(path)
             n = _pathlength(path)
             timesteps_this_batch += n
-            timesteps_so_far += n
+            total_nsteps += n
             if timesteps_this_batch > timesteps_per_batch:
                 break
-
-            return
 
         # Estimate advantage function
         vtargs = []
