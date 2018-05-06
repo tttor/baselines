@@ -42,7 +42,7 @@ def main():
                          animate=False)
 
         ## test
-        neps = 3
+        neps = 100
         paths = []
         for ep_idx in range(neps):
             print("********** testing ep_idx= %i ************"%ep_idx)
