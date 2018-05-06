@@ -19,8 +19,8 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
     inputs, loss, loss_sampled = policy.update_info
     optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
-                                epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
-                                weight_decay_dict=policy.wd_dict, max_grad_norm=None)
+                               epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
+                               weight_decay_dict=policy.wd_dict, max_grad_norm=None)
     pi_var_list = []
     for var in tf.trainable_variables():
         if "pi" in var.name:
@@ -46,9 +46,8 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
         nsteps = 0
         paths = []
         while nsteps < batch_size:
-            path = rollout(env, policy, max_pathlength,
+            path = rollout(env, policy, max_pathlength=max_pathlength,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
-                           # render=True,
                            obfilter=obfilter)
 
             paths.append(path)
@@ -123,7 +122,7 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
     logps = []
     rewards = []
 
-    for _ in range(max_pathlength):
+    for step_idx in range(max_pathlength):
         ## get obs
         state = np.concatenate([ob, prev_ob], -1)
         obs.append(state)
@@ -149,9 +148,10 @@ def rollout(env, policy, max_pathlength, render=False, obfilter=None):
             break
 
         if render:
+            print('--- step_idx= %i ---' % step_idx)
             print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
             print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
-            # print(str(ob))
+            print(str(ob))
             env.render()
             time.sleep(0.100)
 
