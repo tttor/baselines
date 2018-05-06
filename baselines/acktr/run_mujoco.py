@@ -41,11 +41,12 @@ def main():
                          desired_kl=0.002,
                          animate=False)
 
-        ## test
-        neps = 5
-        for ep in range(neps):
-            run_one_episode(env, policy=pi, render=True)
+        # ## test
+        # neps = 5
+        # for ep in range(neps):
+        #     run_one_episode(env, policy=pi, render=True)
 
+    logger.dump_tabular()
     env.close()
 
 def run_one_episode(env, policy, render=False):

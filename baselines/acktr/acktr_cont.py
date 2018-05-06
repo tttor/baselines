@@ -15,7 +15,7 @@ def learn(env,
           desired_kl=0.002,
           animate=False, callback=None):
 
-    lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
+    lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize? not lr
     inputs, loss, loss_sampled = policy.update_info
     optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
                                epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
@@ -93,11 +93,10 @@ def learn(env,
             logger.log("kl just right!")
 
         # Closure this batch
-        logger.record_tabular("EpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("EpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
-        logger.record_tabular("EpLenMean", np.mean([_pathlength(path) for path in paths]))
-        logger.record_tabular("KL", kl)
-        logger.dump_tabular()
+        logger.record_tabular("TrainingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        logger.record_tabular("TrainingEpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
+        logger.record_tabular("TrainingEpLenMean", np.mean([_pathlength(path) for path in paths]))
+        logger.record_tabular("TrainingKL", kl)
 
         if callback: callback()
         total_nsteps += nsteps
