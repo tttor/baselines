@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import time
+
 import numpy as np
 import tensorflow as tf
 
@@ -17,7 +19,6 @@ def main():
 
     env = make_mujoco_env(args.env, args.seed)
 
-    ## train
     with tf.Session(config=tf.ConfigProto()):
         ob_dim = env.observation_space.shape[0]
         ac_dim = env.action_space.shape[0]
@@ -28,16 +29,22 @@ def main():
         with tf.variable_scope("vf"):
             vf = NeuralNetValueFunction(ob_dim, ac_dim)
         with tf.variable_scope("pi"):
-            policy = GaussianMlpPolicy(ob_dim, ac_dim)
+            pi = GaussianMlpPolicy(ob_dim, ac_dim)
 
+        ## train offline
         acktr_cont.learn(env,
-                         policy=policy, vf=vf,
+                         policy=pi, vf=vf,
                          rollout=run_one_episode,
                          gamma=0.99, lam=0.97,
                          batch_size=2500,# in nsteps
                          max_nsteps=args.num_timesteps,
                          desired_kl=0.002,
                          animate=False)
+
+        ## test
+        neps = 5
+        for ep in range(neps):
+            run_one_episode(env, policy=pi, render=True)
 
     env.close()
 
@@ -73,10 +80,10 @@ def run_one_episode(env, policy, render=False):
 
         ## step
         ob, rew, done, info = env.step(scaled_ac)
-
         ob = obfilter(ob)
         rewards.append(rew)
 
+        ## closure
         if render:
             print('--- step_idx= %i ---' % step_idx)
             print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
