@@ -42,13 +42,14 @@ def main():
                          animate=False)
 
         ## test
-        neps = 5
+        neps = 3
         paths = []
         for ep_idx in range(neps):
-            logger.log("********** testing ep_idx= %i ************"%ep_idx)
+            print("********** testing ep_idx= %i ************"%ep_idx)
             path = run_one_episode(env, policy=pi, render=False)
             paths.append(path)
 
+        logger.record_tabular("TestingNEp", len(paths))
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.dump_tabular()
