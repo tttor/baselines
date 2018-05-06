@@ -10,8 +10,13 @@ from baselines.common import tf_util as U
 from baselines.acktr import kfac
 from baselines.acktr.filters import ZFilter
 
-def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
-          animate=False, callback=None, desired_kl=0.002):
+def learn(env,
+          policy, vf,
+          rollout,
+          gamma, lam,
+          batch_size, max_nsteps,
+          desired_kl=0.002,
+          animate=False, callback=None):
 
     obfilter = ZFilter(env.observation_space.shape)
     max_pathlength = env.spec.timestep_limit
@@ -107,57 +112,6 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
 
     coord.request_stop()
     coord.join(enqueue_threads)
-
-def rollout(env, policy, max_pathlength, render=False, obfilter=None):
-    """
-    Simulate the env and policy for max_pathlength steps
-    """
-    ob = env.reset()
-    prev_ob = np.float32(np.zeros(ob.shape))
-    if obfilter: ob = obfilter(ob)
-    terminated = False
-    obs = []
-    acs = []
-    ac_dists = []
-    logps = []
-    rewards = []
-
-    for step_idx in range(max_pathlength):
-        ## get obs
-        state = np.concatenate([ob, prev_ob], -1)
-        obs.append(state)
-        prev_ob = np.copy(ob)
-
-        ## get action
-        ac, ac_dist, logp = policy.act(state)
-        acs.append(ac)
-        ac_dists.append(ac_dist)
-        logps.append(logp)
-
-        scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
-        scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
-
-        ## step
-        ob, rew, done, info = env.step(scaled_ac)
-
-        rewards.append(rew)
-        if obfilter:
-            ob = obfilter(ob)
-        if done:
-            terminated = True
-            break
-
-        if render:
-            print('--- step_idx= %i ---' % step_idx)
-            print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
-            print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
-            print(str(ob))
-            env.render()
-            time.sleep(0.100)
-
-    return {"observation" : np.array(obs), "terminated" : terminated,
-            "reward" : np.array(rewards), "action" : np.array(acs),
-            "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
 
 def _pathlength(path):
     return path["reward"].shape[0]# Loss function that we'll differentiate to get the policy gradient
