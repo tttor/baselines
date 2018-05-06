@@ -97,7 +97,7 @@ def run_one_episode(env, policy, render=False):
             print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
             print(str(ob))
             env.render()
-            time.sleep(0.100)
+            time.sleep(1/60.)
 
         step_idx += 1
 
