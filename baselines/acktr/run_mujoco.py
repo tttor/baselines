@@ -43,9 +43,11 @@ def main():
 
 def run_one_episode(env, policy, render=False):
     obfilter = ZFilter(env.observation_space.shape)
+
     ob = env.reset()
     ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
+
     terminated = False
     obs = []
     acs = []
@@ -55,12 +57,12 @@ def run_one_episode(env, policy, render=False):
 
     for step_idx in range(env.spec.timestep_limit):
         ## get obs
-        state = np.concatenate([ob, prev_ob], -1)
-        obs.append(state)
+        concat_ob = np.concatenate([ob, prev_ob], -1)
+        obs.append(concat_ob)
         prev_ob = np.copy(ob)
 
         ## get action
-        ac, ac_dist, logp = policy.act(state)
+        ac, ac_dist, logp = policy.act(concat_ob)
         acs.append(ac)
         ac_dists.append(ac_dist)
         logps.append(logp)
@@ -71,9 +73,9 @@ def run_one_episode(env, policy, render=False):
         ## step
         ob, rew, done, info = env.step(scaled_ac)
 
+        ob = obfilter(ob)
         rewards.append(rew)
-        if obfilter:
-            ob = obfilter(ob)
+
         if done:
             terminated = True
             break
