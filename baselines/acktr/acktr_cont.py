@@ -19,7 +19,6 @@ def learn(env,
           animate=False, callback=None):
 
     obfilter = ZFilter(env.observation_space.shape)
-    max_pathlength = env.spec.timestep_limit
 
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
     inputs, loss, loss_sampled = policy.update_info
@@ -51,7 +50,7 @@ def learn(env,
         nsteps = 0
         paths = []
         while nsteps < batch_size:
-            path = rollout(env, policy, max_pathlength=max_pathlength,
+            path = rollout(env, policy,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
                            obfilter=obfilter)
 
