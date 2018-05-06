@@ -48,14 +48,15 @@ def run_one_episode(env, policy, render=False):
     ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
 
-    terminated = False
     obs = []
     acs = []
     ac_dists = []
     logps = []
     rewards = []
+    done = False
+    step_idx = 0
 
-    for step_idx in range(env.spec.timestep_limit):
+    while (not done) and (step_idx < env.spec.timestep_limit):
         ## get obs
         concat_ob = np.concatenate([ob, prev_ob], -1)
         obs.append(concat_ob)
@@ -76,10 +77,6 @@ def run_one_episode(env, policy, render=False):
         ob = obfilter(ob)
         rewards.append(rew)
 
-        if done:
-            terminated = True
-            break
-
         if render:
             print('--- step_idx= %i ---' % step_idx)
             print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
@@ -88,7 +85,9 @@ def run_one_episode(env, policy, render=False):
             env.render()
             time.sleep(0.100)
 
-    return {"observation" : np.array(obs), "terminated" : terminated,
+        step_idx += 1
+
+    return {"observation" : np.array(obs), "terminated" : done,
             "reward" : np.array(rewards), "action" : np.array(acs),
             "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
 
