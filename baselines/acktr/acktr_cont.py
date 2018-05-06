@@ -18,7 +18,7 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
 
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
     inputs, loss, loss_sampled = policy.update_info
-    optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,\
+    optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
                                 epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
                                 weight_decay_dict=policy.wd_dict, max_grad_norm=None)
     pi_var_list = []
@@ -54,7 +54,6 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
             paths.append(path)
             n = _pathlength(path)
             nsteps += n
-            total_nsteps += n
 
         # Estimate advantage function
         vtargs = []
@@ -96,13 +95,15 @@ def learn(env, policy, vf, gamma, lam, batch_size, max_nsteps,
         else:
             logger.log("kl just right!")
 
+        # Closure this batch
         logger.record_tabular("EpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("EpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
         logger.record_tabular("EpLenMean", np.mean([_pathlength(path) for path in paths]))
         logger.record_tabular("KL", kl)
+        logger.dump_tabular()
 
         if callback: callback()
-        logger.dump_tabular()
+        total_nsteps += nsteps
         batch_idx += 1
 
     coord.request_stop()
