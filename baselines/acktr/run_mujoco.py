@@ -9,6 +9,7 @@ from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
 from baselines.acktr import acktr_cont
 from baselines.acktr.policies import GaussianMlpPolicy
 from baselines.acktr.value_functions import NeuralNetValueFunction
+from baselines.acktr.filters import ZFilter
 
 def main():
     args = mujoco_arg_parser().parse_args()
@@ -40,10 +41,11 @@ def main():
 
     env.close()
 
-def run_one_episode(env, policy, render=False, obfilter=None):
+def run_one_episode(env, policy, render=False):
+    obfilter = ZFilter(env.observation_space.shape)
     ob = env.reset()
+    ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
-    if obfilter: ob = obfilter(ob)
     terminated = False
     obs = []
     acs = []

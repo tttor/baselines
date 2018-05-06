@@ -8,7 +8,6 @@ from baselines import logger
 from baselines.common import tf_util as U
 
 from baselines.acktr import kfac
-from baselines.acktr.filters import ZFilter
 
 def learn(env,
           policy, vf,
@@ -17,8 +16,6 @@ def learn(env,
           batch_size, max_nsteps,
           desired_kl=0.002,
           animate=False, callback=None):
-
-    obfilter = ZFilter(env.observation_space.shape)
 
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize?
     inputs, loss, loss_sampled = policy.update_info
@@ -51,8 +48,7 @@ def learn(env,
         paths = []
         while nsteps < batch_size:
             path = rollout(env, policy,
-                           render=(len(paths)==0 and (batch_idx % 10 == 0) and animate),
-                           obfilter=obfilter)
+                           render=(len(paths)==0 and (batch_idx % 10 == 0) and animate))
 
             paths.append(path)
             n = _pathlength(path)
