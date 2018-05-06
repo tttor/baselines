@@ -40,10 +40,7 @@ def main():
 
     env.close()
 
-def run_one_episode(env, policy, max_pathlength, render=False, obfilter=None):
-    """
-    Simulate the env and policy for max_pathlength steps
-    """
+def run_one_episode(env, policy, render=False, obfilter=None):
     ob = env.reset()
     prev_ob = np.float32(np.zeros(ob.shape))
     if obfilter: ob = obfilter(ob)
@@ -54,7 +51,7 @@ def run_one_episode(env, policy, max_pathlength, render=False, obfilter=None):
     logps = []
     rewards = []
 
-    for step_idx in range(max_pathlength):
+    for step_idx in range(env.spec.timestep_limit):
         ## get obs
         state = np.concatenate([ob, prev_ob], -1)
         obs.append(state)
