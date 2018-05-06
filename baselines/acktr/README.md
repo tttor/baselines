@@ -38,3 +38,4 @@ sudo chmod +x /usr/local/bin/patchelf
 * global seed?
 * reacher: to always have the same initial joint pos and target pose?
   * diff seed make diff target pose, but still not init jointpos
+* who makes it run parallel using cpu?

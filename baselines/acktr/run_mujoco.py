@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import tensorflow as tf
+
 from baselines import logger
 from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
+
 from baselines.acktr import acktr_cont
 from baselines.acktr.policies import GaussianMlpPolicy
 from baselines.acktr.value_functions import NeuralNetValueFunction
