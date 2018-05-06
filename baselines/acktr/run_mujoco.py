@@ -41,12 +41,18 @@ def main():
                          desired_kl=0.002,
                          animate=False)
 
-        # ## test
-        # neps = 5
-        # for ep in range(neps):
-        #     run_one_episode(env, policy=pi, render=True)
+        ## test
+        neps = 5
+        paths = []
+        for ep_idx in range(neps):
+            logger.log("********** testing ep_idx= %i ************"%ep_idx)
+            path = run_one_episode(env, policy=pi, render=False)
+            paths.append(path)
 
-    logger.dump_tabular()
+        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        logger.record_tabular("TestingEpLenMean", np.mean([path["reward"].shape[0] for path in paths]))
+        logger.dump_tabular()
+
     env.close()
 
 def run_one_episode(env, policy, render=False):

@@ -39,7 +39,7 @@ def learn(env,
     batch_idx = 0
     total_nsteps = 0
     while total_nsteps < max_nsteps:
-        logger.log("********** batch_idx= %i ************"%batch_idx)
+        logger.log("********** training batch_idx= %i ************"%batch_idx)
 
         # Collect paths until we have enough timesteps for this batch
         nsteps = 0
@@ -94,9 +94,9 @@ def learn(env,
 
         # Closure this batch
         logger.record_tabular("TrainingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("TrainingEpRewSEM", np.std([path["reward"].sum()/np.sqrt(len(paths)) for path in paths]))
         logger.record_tabular("TrainingEpLenMean", np.mean([_pathlength(path) for path in paths]))
         logger.record_tabular("TrainingKL", kl)
+        logger.dump_tabular()
 
         if callback: callback()
         total_nsteps += nsteps

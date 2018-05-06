@@ -30,6 +30,7 @@ sudo chmod +x /usr/local/bin/patchelf
 ## fact
 * policy network: Gaussian MLP
 * value network: ?
+* no discount on reward
 * standard reacher has frameskip(timestep skip)= 2
 * reacher ob.shape= 11
   * 2: sin(theta) of 2 joints
