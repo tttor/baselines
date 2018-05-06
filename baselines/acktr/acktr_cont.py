@@ -49,7 +49,7 @@ def learn(env,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate))
 
             paths.append(path)
-            n = _pathlength(path)
+            n = path["length"]
             nsteps += n
 
         # Estimate advantage function
@@ -94,7 +94,7 @@ def learn(env,
 
         # Closure this batch
         logger.record_tabular("TrainingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("TrainingEpLenMean", np.mean([_pathlength(path) for path in paths]))
+        logger.record_tabular("TrainingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("TrainingKL", kl)
         logger.dump_tabular()
 
@@ -104,6 +104,3 @@ def learn(env,
 
     coord.request_stop()
     coord.join(enqueue_threads)
-
-def _pathlength(path):
-    return path["reward"].shape[0]# Loss function that we'll differentiate to get the policy gradient

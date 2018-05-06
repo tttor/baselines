@@ -50,7 +50,7 @@ def main():
             paths.append(path)
 
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("TestingEpLenMean", np.mean([path["reward"].shape[0] for path in paths]))
+        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.dump_tabular()
 
     env.close()
@@ -101,9 +101,9 @@ def run_one_episode(env, policy, render=False):
 
         step_idx += 1
 
-    return {"observation" : np.array(obs), "terminated" : done,
-            "reward" : np.array(rewards), "action" : np.array(acs),
-            "action_dist": np.array(ac_dists), "logp" : np.array(logps)}
+    return {"observation" : np.array(obs), "reward" : np.array(rewards),
+            "action" : np.array(acs), "action_dist": np.array(ac_dists),
+            "logp" : np.array(logps), "terminated" : done, "length": len(rewards)}
 
 if __name__ == "__main__":
     main()
