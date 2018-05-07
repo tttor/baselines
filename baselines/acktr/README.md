@@ -26,6 +26,7 @@ sudo chmod +x /usr/local/bin/patchelf
 * wd_dict: weight data dictionary
 * ob_no: ?
 * com: center of mass
+* ev: explained variance
 
 ## fact
 * policy network: Gaussian MLP
