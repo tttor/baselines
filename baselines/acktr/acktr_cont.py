@@ -36,8 +36,7 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
             path = rollout(env, policy, obfilter,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate))
             paths.append(path)
-            n = path["length"]
-            nsteps += n
+            nsteps += path["length"]
 
         # Estimate advantage function
         vtargs = []; advs = []
