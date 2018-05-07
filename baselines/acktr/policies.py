@@ -56,5 +56,5 @@ class GaussianMlpPolicy(object):
         U.initialize()
 
     def act(self, ob):
-        ac, ac_dist, logp = self._act(ob[None])
+        ac, ac_dist, logp = self._act( ob[np.newaxis,:] )
         return ac[0], ac_dist[0], logp[0]
