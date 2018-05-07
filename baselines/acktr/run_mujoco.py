@@ -2,6 +2,7 @@
 
 import time
 
+import git
 import numpy as np
 import tensorflow as tf
 
@@ -16,6 +17,14 @@ from baselines.acktr.filters import ZFilter
 def main():
     args = mujoco_arg_parser().parse_args()
     logger.configure()
+
+    repo = git.Repo(search_parent_directories=True)
+    csha = repo.head.object.hexsha
+    ctime = time.asctime(time.localtime(repo.head.object.committed_date))
+    cmsg = repo.head.object.message.strip()
+    logger.log('gitCommitSha= %s'%csha)
+    logger.log('gitCommitTime= %s'%ctime)
+    logger.log('gitCommitMsg= %s'%cmsg)
 
     env = make_mujoco_env(args.env, args.seed)
 
