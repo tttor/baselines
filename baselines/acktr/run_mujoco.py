@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import os
 import time
+import pickle
 
 import git
 import numpy as np
@@ -14,6 +16,8 @@ from baselines.acktr.policies import GaussianMlpPolicy
 from baselines.acktr.value_functions import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
+xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr-reacher')
+
 def main():
     args = mujoco_arg_parser().parse_args()
     logger.configure()
@@ -26,10 +30,13 @@ def main():
     logger.log('gitCommitTime= %s'%ctime)
     logger.log('gitCommitMsg= %s'%cmsg)
 
-    env = make_mujoco_env(args.env, args.seed)
-    obfilter = ZFilter(env.observation_space.shape)
+    train(args)
 
-    with tf.Session(config=tf.ConfigProto()):
+def train(args):
+    with tf.Session(config=tf.ConfigProto()) as sess:
+        env = make_mujoco_env(args.env, args.seed)
+        obfilter = ZFilter(env.observation_space.shape)
+
         ob_dim = env.observation_space.shape[0]
         ac_dim = env.action_space.shape[0]
         print('ob_dim= '+str(ob_dim))
@@ -41,6 +48,8 @@ def main():
         with tf.variable_scope("pi"):
             pi = GaussianMlpPolicy(ob_dim, ac_dim)
 
+        saver = tf.train.Saver()
+
         ## train offline
         acktr_cont.learn(env,
                          policy=pi, vf=vf,
@@ -51,11 +60,13 @@ def main():
                          desired_kl=0.002,
                          animate=False)
 
+        saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
+
         ## test
-        neps = 100
+        neps = 1
         paths = []
+        print("*** testing ***************************************************")
         for ep_idx in range(neps):
-            print("********** testing ep_idx= %i ************"%ep_idx)
             path = run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
 
@@ -64,7 +75,19 @@ def main():
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.dump_tabular()
 
-    env.close()
+        with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f: pickle.dump(obfilter, f)
+        env.close()
+
+def test():
+    with tf.Session(config=tf.ConfigProto()) as sess2:
+        saver = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
+        saver.restore( sess2,tf.train.latest_checkpoint(xprmt_dir) )
+
+        graph = tf.get_default_graph()
+
+        vs = tf.global_variables('pi')
+        print(len(vs))
+        print(vs)
 
 def run_one_episode(env, policy, obfilter, render=False):
     ob = env.reset()
