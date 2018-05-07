@@ -7,25 +7,15 @@ from baselines.common import tf_util as U
 
 from baselines.acktr import kfac
 
-def learn(env,
-          policy, vf,
-          rollout, obfilter,
-          gamma, lam,
-          batch_size, max_nsteps,
-          desired_kl=0.002,
-          animate=False, callback=None):
-
+def learn(env, policy, vf, rollout, obfilter, gamma, lam,
+          batch_size, max_nsteps, desired_kl=0.002, animate=False, callback=None):
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize? not lr
-    inputs, loss, loss_sampled = policy.update_info
     optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
                                epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
                                weight_decay_dict=policy.wd_dict, max_grad_norm=None)
-    pi_var_list = []
-    for var in tf.trainable_variables():
-        if "pi" in var.name:
-            pi_var_list.append(var)
-
-    update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_var_list)
+    pi_vars = [var for var in tf.trainable_variables() if 'pi' in var.name]
+    inputs, loss, loss_sampled = policy.update_info
+    update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
     do_update = U.function(inputs, update_op)
     U.initialize()
 
