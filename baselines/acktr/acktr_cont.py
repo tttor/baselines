@@ -9,7 +9,7 @@ from baselines.acktr import kfac
 
 def learn(env,
           policy, vf,
-          rollout,
+          rollout, obfilter,
           gamma, lam,
           batch_size, max_nsteps,
           desired_kl=0.002,
@@ -45,7 +45,7 @@ def learn(env,
         nsteps = 0
         paths = []
         while nsteps < batch_size:
-            path = rollout(env, policy,
+            path = rollout(env, policy, obfilter,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate))
 
             paths.append(path)
