@@ -27,6 +27,7 @@ def main():
     logger.log('gitCommitMsg= %s'%cmsg)
 
     env = make_mujoco_env(args.env, args.seed)
+    obfilter = ZFilter(env.observation_space.shape)
 
     with tf.Session(config=tf.ConfigProto()):
         ob_dim = env.observation_space.shape[0]
@@ -43,7 +44,7 @@ def main():
         ## train offline
         acktr_cont.learn(env,
                          policy=pi, vf=vf,
-                         rollout=run_one_episode,
+                         rollout=run_one_episode, obfilter=obfilter,
                          gamma=0.99, lam=0.97,
                          batch_size=2500,# in nsteps
                          max_nsteps=args.num_timesteps,
@@ -55,7 +56,7 @@ def main():
         paths = []
         for ep_idx in range(neps):
             print("********** testing ep_idx= %i ************"%ep_idx)
-            path = run_one_episode(env, policy=pi, render=False)
+            path = run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
 
         logger.record_tabular("TestingNEp", len(paths))
@@ -65,9 +66,7 @@ def main():
 
     env.close()
 
-def run_one_episode(env, policy, render=False):
-    obfilter = ZFilter(env.observation_space.shape)
-
+def run_one_episode(env, policy, obfilter, render=False):
     ob = env.reset()
     ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
