@@ -3,6 +3,8 @@
 import os
 import time
 import pickle
+import datetime
+import socket
 
 import git
 import numpy as np
@@ -16,12 +18,13 @@ from baselines.acktr.policies import GaussianMlpPolicy
 from baselines.acktr.value_functions import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
-xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr-reacher')
-
 def main():
+    hostname = socket.gethostname(); hostname = hostname.split('.')[0]
+    stamp = datetime.datetime.now().strftime("acktr-reacher-"+hostname+"-%Y%m%d-%H%M%S-%f")
+    xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr-reacher')
+    xprmt_dir = os.path.join(xprmt_dir,stamp)
     args = mujoco_arg_parser().parse_args()
-    logger.configure()
-
+    logger.configure(dir=xprmt_dir)
     repo = git.Repo(search_parent_directories=True)
     csha = repo.head.object.hexsha
     ctime = time.asctime(time.localtime(repo.head.object.committed_date))
@@ -30,9 +33,9 @@ def main():
     logger.log('gitCommitTime= %s'%ctime)
     logger.log('gitCommitMsg= %s'%cmsg)
 
-    train(args)
+    train(args, xprmt_dir)
 
-def train(args):
+def train(args, xprmt_dir):
     with tf.Session(config=tf.ConfigProto()) as sess:
         env = make_mujoco_env(args.env, args.seed)
         obfilter = ZFilter(env.observation_space.shape)
