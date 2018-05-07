@@ -27,11 +27,11 @@ sudo chmod +x /usr/local/bin/patchelf
 * ob_no: ?
 * com: center of mass
 * ev: explained variance
+* lam: lambda
 
 ## fact
 * policy network: Gaussian MLP
 * value network: ?
-* no discount on reward
 * standard reacher has frameskip(timestep skip)= 2
 * reacher ob.shape= 11
   * 2: sin(theta) of 2 joints
@@ -48,9 +48,14 @@ sudo chmod +x /usr/local/bin/patchelf
       ~~but still not init jointpos~~ and init jointpos
     * however, init jointpos random in only from range [-0.1, +0.1) rad,
       which is small, ~5.72 deg
+* loss vs loss_sampled?
+  * ans: loss = surr
+```
+surr = - tf.reduce_mean(adv_n * logprob_n)
+surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
+```
 
 ## question
-* loss vs loss_sampled?
 * global seed?
   * seed passed to `make_mujoco_env(args.env, args.seed)`
     indeed control the randomness of environment

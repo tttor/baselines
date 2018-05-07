@@ -8,7 +8,7 @@ from baselines.common import tf_util as U
 from baselines.acktr import kfac
 
 def learn(env, policy, vf, rollout, obfilter, gamma, lam,
-          batch_size, max_nsteps, desired_kl=0.002, animate=False, callback=None):
+          batch_size, max_nsteps, desired_kl=0.002, animate=False):
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize? not lr
     optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
                                epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
@@ -26,32 +26,29 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         assert (qr != None)
         enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
-    batch_idx = 0
-    total_nsteps = 0
+    batch_idx = 0; total_nsteps = 0
     while total_nsteps < max_nsteps:
         logger.log("********** training batch_idx= %i ************"%batch_idx)
 
         # Collect paths until we have enough timesteps for this batch
-        nsteps = 0
-        paths = []
+        nsteps = 0; paths = []
         while nsteps < batch_size:
             path = rollout(env, policy, obfilter,
                            render=(len(paths)==0 and (batch_idx % 10 == 0) and animate))
-
             paths.append(path)
             n = path["length"]
             nsteps += n
 
         # Estimate advantage function
-        vtargs = []
-        advs = []
+        vtargs = []; advs = []
         for path in paths:
             rew_t = path["reward"]
             return_t = common.discount(rew_t, gamma)
             vtargs.append(return_t)
+
             vpred_t = vf.predict(path)
             vpred_t = np.append(vpred_t, 0.0 if path["terminated"] else vpred_t[-1])
-            delta_t = rew_t + gamma*vpred_t[1:] - vpred_t[:-1]
+            delta_t = (rew_t + gamma*vpred_t[1:]) - vpred_t[:-1]
             adv_t = common.discount(delta_t, gamma * lam)
             advs.append(adv_t)
 
@@ -68,10 +65,9 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         # Policy update
         do_update(ob_no, action_na, standardized_adv_n)
 
+        # Adjust lr
         min_lr = np.float32(1e-8)
         max_lr = np.float32(1e0)
-
-        # Adjust lr
         kl = policy.compute_kl(ob_no, oldac_dist)
         if kl > desired_kl * 2:
             logger.log("kl too high")
@@ -82,13 +78,11 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         else:
             logger.log("kl just right!")
 
-        # Closure this batch
+        # Close this batch
         logger.record_tabular("TrainingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TrainingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("TrainingKL", kl)
         logger.dump_tabular()
-
-        if callback: callback()
         total_nsteps += nsteps
         batch_idx += 1
 
