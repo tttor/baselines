@@ -7,7 +7,7 @@ from baselines.acktr import kfac
 from baselines.acktr.utils import dense
 
 class NeuralNetValueFunction(object):
-    def __init__(self, ob_dim, ac_dim): #pylint: disable=W0613
+    def __init__(self, ob_dim, ac_dim):
         X = tf.placeholder(tf.float32, shape=[None, ob_dim*2+ac_dim*2+2]) # batch of observations
         vtarg_n = tf.placeholder(tf.float32, shape=[None], name='vtarg')
 
