@@ -28,11 +28,13 @@ sudo chmod +x /usr/local/bin/patchelf
 * com: center of mass
 * ev: explained variance
 * lam: lambda
+* surr: surrogate
 
 ## fact
 * policy network: Gaussian MLP
 * value network: ?
 * standard reacher has frameskip(timestep skip)= 2
+* action dim= 2 (for 2 joints)
 * reacher ob.shape= 11
   * 2: sin(theta) of 2 joints
   * 2: cos(theta) of 2 joints
