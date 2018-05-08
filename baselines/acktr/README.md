@@ -33,7 +33,8 @@ sudo chmod +x /usr/local/bin/patchelf
 
 ## fact
 * policy network: Gaussian MLP
-* value network: ?
+* value network: MLP (fully connected, dense)
+  * https://www.tensorflow.org/api_docs/python/tf/nn/elu
 * standard reacher has frameskip(timestep skip)= 2
 * action dim= 2 (for 2 joints)
 * reacher ob.shape= 11
