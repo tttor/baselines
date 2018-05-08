@@ -11,3 +11,4 @@
 
 ## question
 * ppo runs actor-critic?
+  * ans: no learning critic
