@@ -28,7 +28,7 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
 
     batch_idx = 0; total_nsteps = 0
     while total_nsteps < max_nsteps:
-        logger.log("********** training batch_idx= %i ************"%batch_idx)
+        logger.log("***** training batch_idx= %i *****"%batch_idx)
 
         # Collect paths until we have enough timesteps for this batch
         nsteps = 0; paths = []
@@ -51,23 +51,23 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
             adv_t = common.discount(delta_t, gamma * lam)
             advs.append(adv_t)
 
-        # Update value function
+        # Update value-function network
         vf.fit(paths, vtargs)
 
         # Build arrays for policy update
-        ob_no = np.concatenate([path["observation"] for path in paths])
-        action_na = np.concatenate([path["action"] for path in paths])
-        oldac_dist = np.concatenate([path["action_dist"] for path in paths])
-        adv_n = np.concatenate(advs)
-        standardized_adv_n = (adv_n - adv_n.mean()) / (adv_n.std() + 1e-8)
+        obs = np.concatenate([path["observation"] for path in paths])
+        acs = np.concatenate([path["action"] for path in paths])
+        ac_dists = np.concatenate([path["action_dist"] for path in paths])
+        advs = np.concatenate(advs)
+        standardized_advs = (advs - advs.mean()) / (advs.std() + 1e-8)
 
-        # Policy update
-        do_update(ob_no, action_na, standardized_adv_n)
+        # Update policy network
+        do_update(obs, acs, standardized_advs)
 
         # Adjust lr
         min_lr = np.float32(1e-8)
         max_lr = np.float32(1e0)
-        kl = policy.compute_kl(ob_no, oldac_dist)
+        kl = policy.compute_kl(obs, ac_dists)
         if kl > desired_kl * 2:
             logger.log("kl too high")
             tf.assign(lr, tf.maximum(min_lr, lr / 1.5)).eval()
@@ -78,12 +78,15 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
             logger.log("kl just right!")
 
         # Close this batch
+        total_nsteps += nsteps
         logger.record_tabular("TrainingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TrainingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("TrainingKL", kl)
+        logger.record_tabular("TotalNsteps", total_nsteps)
         logger.dump_tabular()
-        total_nsteps += nsteps
         batch_idx += 1
+
+
 
     coord.request_stop()
     coord.join(enqueue_threads)

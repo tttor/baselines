@@ -68,7 +68,7 @@ def train(args, xprmt_dir):
         ## test
         neps = 1
         paths = []
-        print("*** testing ***************************************************")
+        print("***** testing *****")
         for ep_idx in range(neps):
             path = run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
