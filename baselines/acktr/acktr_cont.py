@@ -86,7 +86,5 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         logger.dump_tabular()
         batch_idx += 1
 
-
-
     coord.request_stop()
-    coord.join(enqueue_threads)
+    coord.join(enqueue_threads) # Wait for all the threads to terminate.
