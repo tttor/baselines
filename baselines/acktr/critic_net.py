@@ -31,14 +31,17 @@ class NeuralNetValueFunction(object):
         update_op, self.q_runner = optim.minimize(loss, loss_sampled, var_list=vf_var_list)
         self.do_update = U.function([X, vtarg_n], update_op) #pylint: disable=E1101
         U.initialize() # Initialize uninitialized TF variables
+
     def _preproc(self, path):
         l = path["reward"].shape[0]
         al = np.arange(l).reshape(-1,1)/10.0
         act = path["action_dist"].astype('float32')
         X = np.concatenate([path['observation'], act, al, np.ones((l, 1))], axis=1)
         return X
+
     def predict(self, path):
         return self._predict(self._preproc(path))
+
     def fit(self, paths, targvals):
         X = np.concatenate([self._preproc(p) for p in paths])
         y = np.concatenate(targvals)
