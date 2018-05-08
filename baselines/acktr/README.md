@@ -75,7 +75,6 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
   * seed=0 does not mean using time as seed
     * https://stackoverflow.com/questions/21494489/what-does-numpy-random-seed0-do
     * numpy.random.seed() causes numpy to set the seed to a random number obtained from /dev/urandom
-* who makes it run parallel using cpu?
 * for Reacher-v2:
   why set: reward_threshold=-3.75? instead of `=0`?
   is it sort of tolerance?
