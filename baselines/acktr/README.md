@@ -1,12 +1,12 @@
 # ACKTR
 
-- Original paper: https://arxiv.org/abs/1708.05144
-- Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
-- runs the algorithm for 40M frames = 10M timesteps on an Atari game.
+* Original paper: https://arxiv.org/abs/1708.05144
+* Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
+* runs the algorithm for 40M frames = 10M timesteps on an Atari game.
   See help (`-h`) for more options.
-  * `python -m baselines.acktr.run_atari`
-- runs in mujoco env
-  * `python -m baselines.acktr.run_mujoco --env Reacher-v2 --seed 0 --num-timesteps 1000`
+```python -m baselines.acktr.run_atari```
+* runs in mujoco env
+```python -m baselines.acktr.run_mujoco --env Reacher-v2 --seed 0 --num-timesteps 1000```
 
 ## env setup (Python 3.5.2, 3.6.5)
 * sudo apt-get install python3.6-dev
@@ -22,13 +22,14 @@ sudo chmod +x /usr/local/bin/patchelf
   * https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory
 
 ## abbreviation
-* kl_div: Kullback-Leibler divergence
-* wd_dict: weight data dictionary
-* ob_no: ?
 * com: center of mass
 * ev: explained variance, see `baselines/common/math_util.py`
+* kl_div: Kullback-Leibler divergence
 * lam: lambda
+* ob_no: observation with dimension 'n x o'?
 * surr: surrogate
+* qr: queue runner
+* wd_dict: weight data dictionary
 
 ## fact
 * policy network: Gaussian MLP
@@ -56,6 +57,13 @@ sudo chmod +x /usr/local/bin/patchelf
 surr = - tf.reduce_mean(adv_n * logprob_n)
 surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 ```
+* kfac
+  * baselines/acktr/kfac.py
+  * https://www.tensorflow.org/api_docs/python/tf/contrib/kfac/optimizer/KfacOptimizer
+  * https://arxiv.org/abs/1503.05671
+* multi-threading is for optimization (network operations), not for rollout
+  * https://www.tensorflow.org/api_docs/python/tf/train/QueueRunner
+  * https://www.tensorflow.org/api_docs/python/tf/train/Coordinator
 
 ## question
 * global seed?
