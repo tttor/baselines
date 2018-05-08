@@ -32,7 +32,7 @@ class NeuralNetValueFunction(object):
         self.do_update = U.function([X, vtarg_n], update_op) #pylint: disable=E1101
         U.initialize() # Initialize uninitialized TF variables
     def _preproc(self, path):
-        l = pathlength(path)
+        l = path["reward"].shape[0]
         al = np.arange(l).reshape(-1,1)/10.0
         act = path["action_dist"].astype('float32')
         X = np.concatenate([path['observation'], act, al, np.ones((l, 1))], axis=1)
@@ -45,6 +45,3 @@ class NeuralNetValueFunction(object):
         logger.record_tabular("EVBefore", common.explained_variance(self._predict(X), y))
         for _ in range(25): self.do_update(X, y)
         logger.record_tabular("EVAfter", common.explained_variance(self._predict(X), y))
-
-def pathlength(path):
-    return path["reward"].shape[0]
