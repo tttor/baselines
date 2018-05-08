@@ -26,7 +26,7 @@ sudo chmod +x /usr/local/bin/patchelf
 * wd_dict: weight data dictionary
 * ob_no: ?
 * com: center of mass
-* ev: explained variance
+* ev: explained variance, see `baselines/common/math_util.py`
 * lam: lambda
 * surr: surrogate
 
