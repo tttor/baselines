@@ -39,11 +39,11 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
             nsteps += path["length"]
 
         # Estimate advantage function
-        vtargs = []; advs = []
+        returns = []; advs = []
         for path in paths:
             rew_t = path["reward"]
             return_t = common.discount(rew_t, gamma)
-            vtargs.append(return_t)
+            returns.append(return_t)
 
             vpred_t = vf.predict(path)
             vpred_t = np.append(vpred_t, 0.0 if path["terminated"] else vpred_t[-1])
@@ -52,7 +52,7 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
             advs.append(adv_t)
 
         # Update value-function network
-        vf.fit(paths, vtargs)
+        vf.fit(paths, returns)
 
         # Build arrays for policy update
         obs = np.concatenate([path["observation"] for path in paths])
