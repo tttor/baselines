@@ -14,7 +14,7 @@ from baselines import logger
 from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
 
 from baselines.acktr import acktr_cont
-from baselines.acktr.actor_net import GaussianMlpPolicy
+from baselines.acktr.actor_net_test import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 from baselines.acktr.run_mujoco import run_one_episode
@@ -51,21 +51,34 @@ def test(args):
         ob_dim = env.observation_space.shape[0]
         ac_dim = env.action_space.shape[0]
 
-        with tf.variable_scope("pi"):
-            pi = GaussianMlpPolicy(ob_dim, ac_dim)
-
         meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
         graph = tf.get_default_graph()
 
-        paths = []
-        for ep_idx in range(neps):
-            path = run_one_episode(env, pi, obfilter, render=False)
-            paths.append(path)
+        # w = graph.get_tensor_by_name("pi/h1/w:0")
+        # print(w)
+        # print(sess.run(w))
 
-        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
-        logger.record_tabular("TestingNEp", neps)
-        logger.dump_tabular()
+        # with tf.variable_scope("pi"):
+        #     pi = GaussianMlpPolicy(ob_dim, ac_dim, graph)
+
+        #     # w2 = graph.get_tensor_by_name("pi/h1/w:0")
+        #     # print(w)
+        #     # print(sess.run(w))
+        #     # assert w==w2
+
+        # vs = tf.global_variables()
+        # print(len(vs))
+        # print(vs)
+
+        # paths = []
+        # for ep_idx in range(neps):
+        #     path = run_one_episode(env, pi, obfilter, render=False)
+        #     paths.append(path)
+
+        # logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        # logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        # logger.record_tabular("TestingNEp", neps)
+        # logger.dump_tabular()
 
         env.close()
 
