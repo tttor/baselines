@@ -51,34 +51,40 @@ def test(args):
         ob_dim = env.observation_space.shape[0]
         ac_dim = env.action_space.shape[0]
 
-        meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
-        graph = tf.get_default_graph()
+        # meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
+        # graph = tf.get_default_graph()
 
-        # w = graph.get_tensor_by_name("pi/h1/w:0")
-        # print(w)
-        # print(sess.run(w))
+        # with tf.variable_scope("pi", reuse=tf.AUTO_REUSE):
+        with tf.variable_scope("pi"):
+            meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
+            graph = tf.get_default_graph()
 
-        # with tf.variable_scope("pi"):
-        #     pi = GaussianMlpPolicy(ob_dim, ac_dim, graph)
+            pi = GaussianMlpPolicy(ob_dim, ac_dim, graph)
 
-        #     # w2 = graph.get_tensor_by_name("pi/h1/w:0")
-        #     # print(w)
-        #     # print(sess.run(w))
-        #     # assert w==w2
+            # # w = graph.get_tensor_by_name("pi/h1/w:0")
+            # w = graph.get_tensor_by_name("pi/h1/b:0")
+            # print(w)
+            # print(sess.run(w))
 
-        # vs = tf.global_variables()
-        # print(len(vs))
-        # print(vs)
+            # w2 = graph.get_tensor_by_name("pi/h1/w:0")
+            w2 = graph.get_tensor_by_name("pi/h1/b:0")
+            print(w2)
+            print(sess.run(w2))
+            # assert w==w2
 
-        # paths = []
-        # for ep_idx in range(neps):
-        #     path = run_one_episode(env, pi, obfilter, render=False)
-        #     paths.append(path)
+        vs = tf.global_variables()
+        for v in vs: print(v)
+        print(len(vs))
 
-        # logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        # logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
-        # logger.record_tabular("TestingNEp", neps)
-        # logger.dump_tabular()
+        paths = []
+        for ep_idx in range(neps):
+            path = run_one_episode(env, pi, obfilter, render=False)
+            paths.append(path)
+
+        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        logger.record_tabular("TestingNEp", neps)
+        logger.dump_tabular()
 
         env.close()
 
