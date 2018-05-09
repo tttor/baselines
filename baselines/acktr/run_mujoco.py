@@ -68,7 +68,7 @@ def train(args, xprmt_dir):
         saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
 
         ## test
-        neps = 1
+        neps = 100
         paths = []
         print("***** testing *****")
         for ep_idx in range(neps):
@@ -84,7 +84,7 @@ def train(args, xprmt_dir):
         env.close()
 
 def test(args):
-    nep = 100
+    neps = 100
     xprmt_dir = '/home/tor/xprmt/acktr-reacher/acktr-reacher-goliath-20180508-191258-145074'
     meta_fpath = os.path.join(xprmt_dir,'training_acktr_reacher.meta')
     meta_graph = tf.train.import_meta_graph(meta_fpath)
@@ -104,13 +104,13 @@ def test(args):
         graph = tf.get_default_graph()
 
         paths = []
-        for ep_idx in range(nep):
+        for ep_idx in range(neps):
             path = run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
 
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
-        logger.record_tabular("TestingNEp", nep)
+        logger.record_tabular("TestingNEp", neps)
         logger.dump_tabular()
 
         env.close()
