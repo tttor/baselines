@@ -23,6 +23,7 @@ def main():
     stamp = datetime.datetime.now().strftime("acktr-reacher-"+hostname+"-%Y%m%d-%H%M%S-%f")
     xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr-reacher')
     xprmt_dir = os.path.join(xprmt_dir,stamp)
+
     args = mujoco_arg_parser().parse_args()
     logger.configure(dir=xprmt_dir)
     repo = git.Repo(search_parent_directories=True)
@@ -33,7 +34,8 @@ def main():
     logger.log('gitCommitTime= %s'%ctime)
     logger.log('gitCommitMsg= %s'%cmsg)
 
-    train(args, xprmt_dir)
+    # train(args, xprmt_dir)
+    test(args)
 
 def train(args, xprmt_dir):
     with tf.Session(config=tf.ConfigProto()) as sess:
@@ -81,16 +83,37 @@ def train(args, xprmt_dir):
         with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f: pickle.dump(obfilter, f)
         env.close()
 
-def test():
-    with tf.Session(config=tf.ConfigProto()) as sess2:
-        saver = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
-        saver.restore( sess2,tf.train.latest_checkpoint(xprmt_dir) )
+def test(args):
+    nep = 100
+    xprmt_dir = '/home/tor/xprmt/acktr-reacher/acktr-reacher-goliath-20180508-191258-145074'
+    meta_fpath = os.path.join(xprmt_dir,'training_acktr_reacher.meta')
+    meta_graph = tf.train.import_meta_graph(meta_fpath)
 
+    with tf.Session(config=tf.ConfigProto()) as sess:
+        env = make_mujoco_env(args.env, args.seed)
+        with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'rb') as f:
+            obfilter = pickle.load(f)
+
+        ob_dim = env.observation_space.shape[0]
+        ac_dim = env.action_space.shape[0]
+
+        with tf.variable_scope("pi"):
+            pi = GaussianMlpPolicy(ob_dim, ac_dim)
+
+        meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
         graph = tf.get_default_graph()
 
-        vs = tf.global_variables('pi')
-        print(len(vs))
-        print(vs)
+        paths = []
+        for ep_idx in range(nep):
+            path = run_one_episode(env, pi, obfilter, render=False)
+            paths.append(path)
+
+        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        logger.record_tabular("TestingNEp", nep)
+        logger.dump_tabular()
+
+        env.close()
 
 def run_one_episode(env, policy, obfilter, render=False):
     ob = env.reset()
