@@ -118,6 +118,7 @@ def run_one_episode(env, policy, obfilter, render=False):
         ## closure
         if render:
             # print('--- step_idx= %i ---' % step_idx)
+            # print('done= '+str(done))
             # print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
             # print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
             # print(str(ob))

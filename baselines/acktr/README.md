@@ -31,7 +31,7 @@ sudo chmod +x /usr/local/bin/patchelf
 * qr: queue runner
 * wd_dict: weight data dictionary
 
-## fact
+## fact acktr
 * policy network: Gaussian MLP
 * value network: MLP (fully connected, dense)
   * https://www.tensorflow.org/api_docs/python/tf/nn/elu
@@ -65,6 +65,10 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 * multi-threading is for optimization (network operations), not for rollout
   * https://www.tensorflow.org/api_docs/python/tf/train/QueueRunner
   * https://www.tensorflow.org/api_docs/python/tf/train/Coordinator
+
+## fact Reacher-v2
+* `done` is true when step_idx reaches `env.spec.timestep_limit`==50,
+  * not when fingertip coincides with target position
 
 ## question
 * global seed?
