@@ -35,16 +35,6 @@ sudo chmod +x /usr/local/bin/patchelf
 * policy network: Gaussian MLP
 * value network: MLP (fully connected, dense)
   * https://www.tensorflow.org/api_docs/python/tf/nn/elu
-* standard reacher has frameskip(timestep skip)= 2
-* action dim= 2 (for 2 joints)
-* reacher ob.shape= 11
-  * 2: sin(theta) of 2 joints
-  * 2: cos(theta) of 2 joints
-  * 2: qpos of target, x and y slide joints
-  * 2: qvel of 2 joints
-  * 3: distance between fingertip and target (3D cartesian)
-* reacher, where is env.spec.timestep_limit=50 per episode defined?
-  * ans: /home/tor/ws-fork/gym@tttor/gym/envs/__init__.py
 * is this learning under various init state (jpos, target pose?
   * ans: yes, reset() is called at every rollout()
   * reacher: to always have the same initial joint pos and target pose?
@@ -69,6 +59,17 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 ## fact Reacher-v2
 * `done` is true when step_idx reaches `env.spec.timestep_limit`==50,
   * not when fingertip coincides with target position
+  * the agent maintain its position once it has reach the target position
+* reacher, where is env.spec.timestep_limit=50 per episode defined?
+  * ans: /home/tor/ws-fork/gym@tttor/gym/envs/__init__.py
+* standard reacher has frameskip(timestep skip)= 2
+* action dim= 2 (for 2 joints)
+* reacher ob.shape= 11
+  * 2: sin(theta) of 2 joints
+  * 2: cos(theta) of 2 joints
+  * 2: qpos of target, x and y slide joints
+  * 2: qvel of 2 joints
+  * 3: distance between fingertip and target (3D cartesian)
 
 ## question
 * global seed?
