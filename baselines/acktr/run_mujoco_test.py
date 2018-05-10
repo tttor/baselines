@@ -65,14 +65,15 @@ def test(seed, neps, xprmt_dir):
             path = run_one_episode(env, pi, obfilter, render=True)
             paths.append(path)
 
-            logger.record_tabular("EpRew", path["reward"].sum())
+            logger.record_tabular("EpReturn", path["reward"].sum())
             logger.record_tabular("EpLen", path["length"])
             logger.record_tabular("EpIdx", ep_idx)
-            logger.record_tabular("Done", path['terminated'])
+            logger.record_tabular("ReachedAtStepIdx", path['reached_at_step_idx'])
             logger.dump_tabular()
 
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        logger.record_tabular("TestingEpReachedAtStepIdxMean", np.mean([path["reached_at_step_idx"] for path in paths]))
         logger.record_tabular("TestingNEp", neps)
         logger.dump_tabular()
 
