@@ -74,6 +74,7 @@ def test(seed, neps, xprmt_dir):
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("TestingEpReachedAtStepIdxMean", np.mean([path["reached_at_step_idx"] for path in paths]))
         logger.record_tabular("TestingNEp", neps)
+        logger.record_tabular("TestingSeed", seed)
         logger.dump_tabular()
 
         env.close()
