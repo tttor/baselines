@@ -18,7 +18,6 @@ from baselines.acktr import acktr_cont
 from baselines.acktr.actor_net_test import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
-from baselines.acktr.run_mujoco import run_one_episode
 
 def main():
     if len(sys.argv)!=4:
@@ -62,7 +61,7 @@ def test(seed, neps, xprmt_dir):
 
         paths = []
         for ep_idx in range(neps):
-            path = run_one_episode(env, pi, obfilter, render=True)
+            path = acktr_cont.run_one_episode(env, pi, obfilter, render=True)
             paths.append(path)
 
             logger.record_tabular("EpReturn", path["reward"].sum())

@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import tensorflow as tf
 
@@ -88,3 +90,49 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
 
     coord.request_stop()
     coord.join(enqueue_threads) # Wait for all the threads to terminate.
+
+def run_one_episode(env, policy, obfilter, render=False):
+    ob = env.reset()
+    ob = obfilter(ob)
+    prev_ob = np.float32(np.zeros(ob.shape))
+    obs = []; acs = []; ac_dists = []; logps = []; rewards = []
+    done = False; step_idx = 0; reached_at_step_idx = env.spec.timestep_limit-1
+
+    while (not done) and (step_idx < env.spec.timestep_limit):
+        ## get obs
+        concat_ob = np.concatenate([ob, prev_ob], -1)
+        obs.append(concat_ob)
+        prev_ob = np.copy(ob)
+
+        ## get action
+        ac, ac_dist, logp = policy.act(concat_ob)
+        acs.append(ac)
+        ac_dists.append(ac_dist)
+        logps.append(logp)
+
+        scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
+        scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
+
+        ## step
+        ob, rew, done, info = env.step(scaled_ac)
+        ob = obfilter(ob)
+        rewards.append(rew)
+
+        if np.isclose(info['reward_dist'], 0.0, atol=0.01):
+            reached_at_step_idx = step_idx
+
+        ## closure
+        if render:
+            # print('--- step_idx= %i ---' % step_idx)
+            # print('done= '+str(done))
+            # print('scaled_ac= %f, %f' % (scaled_ac[0], scaled_ac[1]))
+            # print('rew(=dist+ctrl)= %f (=%f + %f)' % (rew,info['reward_dist'],info['reward_ctrl']))
+            # print(str(ob))
+            env.render()
+            time.sleep(1/60.)
+        step_idx += 1
+
+    return {"observation" : np.array(obs), "reward" : np.array(rewards),
+            "action" : np.array(acs), "action_dist": np.array(ac_dists),
+            "reached_at_step_idx": reached_at_step_idx,
+            "logp" : np.array(logps), "terminated" : done, "length": len(rewards)}
