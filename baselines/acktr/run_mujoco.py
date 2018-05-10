@@ -77,6 +77,7 @@ def train(args, xprmt_dir):
         logger.record_tabular("TestingNEp", len(paths))
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        logger.record_tabular("Seed", args.seed)
         logger.dump_tabular()
 
         with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f: pickle.dump(obfilter, f)
