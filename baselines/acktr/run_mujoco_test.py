@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import time
 import pickle
 import datetime
@@ -38,8 +39,8 @@ def main():
     test(args)
 
 def test(args):
-    neps = 100
-    xprmt_dir = '/home/tor/xprmt/acktr-reacher/acktr-reacher-goliath-20180508-191258-145074'
+    neps = 10
+    xprmt_dir = '/home/tor/xprmt/acktr-reacher/acktr-reacher-goliath-20180509-190835-392893'
     meta_fpath = os.path.join(xprmt_dir,'training_acktr_reacher.meta')
     meta_graph = tf.train.import_meta_graph(meta_fpath)
 
@@ -51,34 +52,15 @@ def test(args):
         ob_dim = env.observation_space.shape[0]
         ac_dim = env.action_space.shape[0]
 
-        # meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
-        # graph = tf.get_default_graph()
-
-        # with tf.variable_scope("pi", reuse=tf.AUTO_REUSE):
         with tf.variable_scope("pi"):
             meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
             graph = tf.get_default_graph()
 
             pi = GaussianMlpPolicy(ob_dim, ac_dim, graph)
 
-            # # w = graph.get_tensor_by_name("pi/h1/w:0")
-            # w = graph.get_tensor_by_name("pi/h1/b:0")
-            # print(w)
-            # print(sess.run(w))
-
-            # w2 = graph.get_tensor_by_name("pi/h1/w:0")
-            w2 = graph.get_tensor_by_name("pi/h1/b:0")
-            print(w2)
-            print(sess.run(w2))
-            # assert w==w2
-
-        vs = tf.global_variables()
-        for v in vs: print(v)
-        print(len(vs))
-
         paths = []
         for ep_idx in range(neps):
-            path = run_one_episode(env, pi, obfilter, render=False)
+            path = run_one_episode(env, pi, obfilter, render=True)
             paths.append(path)
 
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
