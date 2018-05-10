@@ -21,13 +21,22 @@ from baselines.acktr.filters import ZFilter
 from baselines.acktr.run_mujoco import run_one_episode
 
 def main():
-    hostname = socket.gethostname(); hostname = hostname.split('.')[0]
-    stamp = datetime.datetime.now().strftime("acktr-reacher-test-"+hostname+"-%Y%m%d-%H%M%S-%f")
-    xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr-reacher')
-    xprmt_dir = os.path.join(xprmt_dir,stamp)
+    if len(sys.argv)!=4:
+        print('Usage:')
+        print('python -m baselines.acktr.run_mujoco_test <seed> <neps> <xprmt_dir> ')
+        return
 
-    args = mujoco_arg_parser().parse_args()
-    logger.configure(dir=xprmt_dir)
+    seed = int(sys.argv[1])
+    neps = int(sys.argv[2])
+    xprmt_dir = sys.argv[3]
+
+    test(seed, neps, xprmt_dir)
+
+def test(seed, neps, xprmt_dir):
+    hostname = socket.gethostname(); hostname = hostname.split('.')[0]
+    stamp = datetime.datetime.now().strftime("test-"+hostname+"-%Y%m%d-%H%M%S-%f")
+
+    logger.configure(dir=os.path.join(xprmt_dir, stamp))
     repo = git.Repo(search_parent_directories=True)
     csha = repo.head.object.hexsha
     ctime = time.asctime(time.localtime(repo.head.object.committed_date))
@@ -36,26 +45,19 @@ def main():
     logger.log('gitCommitTime= %s'%ctime)
     logger.log('gitCommitMsg= %s'%cmsg)
 
-    test(args)
-
-def test(args):
-    neps = 10
-    xprmt_dir = '/home/tor/xprmt/acktr-reacher/acktr-reacher-goliath-20180509-190835-392893'
-    meta_fpath = os.path.join(xprmt_dir,'training_acktr_reacher.meta')
-    meta_graph = tf.train.import_meta_graph(meta_fpath)
+    meta_graph = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
 
     with tf.Session(config=tf.ConfigProto()) as sess:
-        env = make_mujoco_env(args.env, args.seed)
+        env = make_mujoco_env('Reacher-v2', seed)
         with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'rb') as f:
             obfilter = pickle.load(f)
-
-        ob_dim = env.observation_space.shape[0]
-        ac_dim = env.action_space.shape[0]
 
         with tf.variable_scope("pi"):
             meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
             graph = tf.get_default_graph()
 
+            ob_dim = env.observation_space.shape[0]
+            ac_dim = env.action_space.shape[0]
             pi = GaussianMlpPolicy(ob_dim, ac_dim, graph)
 
         paths = []
