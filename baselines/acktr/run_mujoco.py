@@ -57,7 +57,7 @@ def train(args, xprmt_dir):
         ## train offline
         acktr_cont.learn(env,
                          policy=pi, vf=vf,
-                         rollout=run_one_episode, obfilter=obfilter,
+                         rollout=acktr_cont.run_one_episode, obfilter=obfilter,
                          gamma=0.99, lam=0.97,
                          batch_size=2500,# in nsteps
                          max_nsteps=args.num_timesteps,
