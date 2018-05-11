@@ -20,21 +20,27 @@ from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
 def main():
-    if len(sys.argv)!=4:
-        print('Usage:')
-        print('python -m baselines.acktr.run_mujoco_test <seed> <neps> <xprmt_dir> ')
-        return
+    args = mujoco_arg_parser().parse_args()
+    if args.neps is None: assert args.nsteps is not None
+    if args.nsteps is None: assert args.neps is not None
+    assert (args.neps is None) or (args.nsteps is None)
 
-    seed = int(sys.argv[1])
-    neps = int(sys.argv[2])
-    xprmt_dir = sys.argv[3]
+    asset_dir = '/home/tor/ws-fork/gym@tttor/gym/envs/mujoco/assets'
+    env_id, timestep = args.env.split('@')
+    bare_env_id = env_id.lower().replace('-v2','')
+    xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
+    xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
+    try:
+        os.remove(xml_dst)
+    except OSError:
+        pass
+    os.symlink(xml_src, xml_dst)
 
-    test(seed, neps, xprmt_dir)
+    test(env_id, args.seed, args.neps, xprmt_dir=args.dir)
 
-def test(seed, neps, xprmt_dir):
+def test(env_id, seed, neps, xprmt_dir):
     hostname = socket.gethostname(); hostname = hostname.split('.')[0]
     stamp = datetime.datetime.now().strftime("test-"+hostname+"-%Y%m%d-%H%M%S-%f")
-
     logger.configure(dir=os.path.join(xprmt_dir, stamp))
     repo = git.Repo(search_parent_directories=True)
     csha = repo.head.object.hexsha
@@ -47,7 +53,9 @@ def test(seed, neps, xprmt_dir):
     meta_graph = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
 
     with tf.Session(config=tf.ConfigProto()) as sess:
-        env = make_mujoco_env('Reacher-v2', seed)
+        env = make_mujoco_env(env_id, seed)
+        print('*** env: created! ***')
+
         with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'rb') as f:
             obfilter = pickle.load(f)
 
@@ -76,7 +84,6 @@ def test(seed, neps, xprmt_dir):
         logger.record_tabular("TestingNEp", neps)
         logger.record_tabular("TestingSeed", seed)
         logger.dump_tabular()
-
         env.close()
 
 if __name__ == "__main__":
