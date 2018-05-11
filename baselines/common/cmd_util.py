@@ -72,9 +72,12 @@ def mujoco_arg_parser():
     Create an argparse.ArgumentParser for run_mujoco.py.
     """
     parser = arg_parser()
-    parser.add_argument('--env', help='environment ID', type=str, default='Reacher-v2')
-    parser.add_argument('--seed', help='RNG seed', type=int, default=0)
-    parser.add_argument('--num-timesteps', type=int, default=int(1e6))
+    parser.add_argument('--env', help='environment ID', type=str, default=None)
+    parser.add_argument('--seed', help='RNG seed', type=int, default=None)
+    parser.add_argument('--nsteps', help='nsteps', type=int, default=None)
+    parser.add_argument('--neps', help='num of episodes', type=int, default=None)
+    parser.add_argument('--mode', help='mode', type=str, default=None)
+    parser.add_argument('--dir', help='(xprmt) dir', type=str, default=None)
     return parser
 
 def robotics_arg_parser():
