@@ -72,11 +72,11 @@ def mujoco_arg_parser():
     Create an argparse.ArgumentParser for run_mujoco.py.
     """
     parser = arg_parser()
-    parser.add_argument('--env', help='environment ID', type=str, default=None)
-    parser.add_argument('--seed', help='RNG seed', type=int, default=None)
+    parser.add_argument('--mode', help='mode', type=str, choices=['train','test'], default=None, required=True)
+    parser.add_argument('--env', help='environment ID', type=str, default=None, required=True)
+    parser.add_argument('--seed', help='RNG seed', type=int, default=None, required=True)
     parser.add_argument('--nsteps', help='nsteps', type=int, default=None)
     parser.add_argument('--neps', help='num of episodes', type=int, default=None)
-    parser.add_argument('--mode', help='mode', type=str, default=None)
     parser.add_argument('--dir', help='(xprmt) dir', type=str, default=None)
     return parser
 

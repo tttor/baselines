@@ -19,39 +19,53 @@ from baselines.acktr.actor_net_test import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
+asset_dir = os.path.join(os.path.expanduser("~"),'ws/gym@tttor/gym/envs/mujoco/assets')
+
 def main():
     args = mujoco_arg_parser().parse_args()
     assert not ((args.neps is None) and (args.nsteps is None))
     assert not ((args.neps is not None) and (args.nsteps is not None))
+    repo = git.Repo(search_parent_directories=True)
+    csha = repo.head.object.hexsha
+    ctime = time.asctime(time.localtime(repo.head.object.committed_date))
+    cmsg = repo.head.object.message.strip()
+    hostname = socket.gethostname(); hostname = hostname.split('.')[0]
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    stamp = '_'.join(['acktr',args.mode,args.env,hostname,timestamp])
+    if args.mode=='train':
+        xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr', stamp)
+    else:
+        assert args.dir is not None
+        xprmt_dir = os.path.join(args.dir, stamp)
+    logger.configure(dir=xprmt_dir)
+    logger.log('gitCommitSha= %s'%csha)
+    logger.log('gitCommitTime= %s'%ctime)
+    logger.log('gitCommitMsg= %s'%cmsg)
+    logger.log('seed= %i'%args.seed)
 
-    asset_dir = '/home/tor/ws-fork/gym@tttor/gym/envs/mujoco/assets'
     env_id, timestep = args.env.split('@')
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
     os.symlink(xml_src, xml_dst)
 
-    test(env_id, args.seed, args.neps, xprmt_dir=args.dir)
+    env = make_mujoco_env(env_id, args.seed)
     os.remove(xml_dst)
+    print('*** env: created! ***')
 
-def test(env_id, seed, neps, xprmt_dir):
-    hostname = socket.gethostname(); hostname = hostname.split('.')[0]
-    stamp = datetime.datetime.now().strftime("test-"+hostname+"-%Y%m%d-%H%M%S-%f")
-    logger.configure(dir=os.path.join(xprmt_dir, stamp))
-    repo = git.Repo(search_parent_directories=True)
-    csha = repo.head.object.hexsha
-    ctime = time.asctime(time.localtime(repo.head.object.committed_date))
-    cmsg = repo.head.object.message.strip()
-    logger.log('gitCommitSha= %s'%csha)
-    logger.log('gitCommitTime= %s'%ctime)
-    logger.log('gitCommitMsg= %s'%cmsg)
+    if args.mode=='train':
+        train()
+    else:
+        test(env, args.neps, args.dir)
 
+    env.close()
+
+def train():
+    pass
+
+def test(env, neps, xprmt_dir):
     meta_graph = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
-
     with tf.Session(config=tf.ConfigProto()) as sess:
-        env = make_mujoco_env(env_id, seed)
-        print('*** env: created! ***')
-
         with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'rb') as f:
             obfilter = pickle.load(f)
 
@@ -78,9 +92,7 @@ def test(env_id, seed, neps, xprmt_dir):
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("TestingEpReachedAtStepIdxMean", np.mean([path["reached_at_step_idx"] for path in paths]))
         logger.record_tabular("TestingNEp", neps)
-        logger.record_tabular("TestingSeed", seed)
         logger.dump_tabular()
-        env.close()
 
 if __name__ == "__main__":
     main()

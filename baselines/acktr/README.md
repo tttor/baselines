@@ -16,6 +16,15 @@
 sudo curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf
 sudo chmod +x /usr/local/bin/patchelf
 ```
+* install openai baseline
+```pip install -e .```
+* install openai gym
+```pip install -e '.[mujoco]'```
+* install util
+```
+pip install gitpython
+pip install opencv-python
+```
 * ref
   * https://github.com/openai/mujoco-py/issues/47
   * https://github.com/openai/mujoco-py/issues/96
