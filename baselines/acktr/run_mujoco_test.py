@@ -23,8 +23,6 @@ asset_dir = os.path.join(os.path.expanduser("~"),'ws/gym@tttor/gym/envs/mujoco/a
 
 def main():
     args = mujoco_arg_parser().parse_args()
-    assert not ((args.neps is None) and (args.nsteps is None))
-    assert not ((args.neps is not None) and (args.nsteps is not None))
     repo = git.Repo(search_parent_directories=True)
     csha = repo.head.object.hexsha
     ctime = time.asctime(time.localtime(repo.head.object.committed_date))
@@ -33,9 +31,12 @@ def main():
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     stamp = '_'.join(['acktr',args.mode,args.env,hostname,timestamp])
     if args.mode=='train':
+        assert args.dir is None
+        assert args.nsteps is not None
         xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr', stamp)
     else:
         assert args.dir is not None
+        assert args.neps is not None
         xprmt_dir = os.path.join(args.dir, stamp)
     logger.configure(dir=xprmt_dir)
     logger.log('gitCommitSha= %s'%csha)
@@ -54,14 +55,52 @@ def main():
     print('*** env: created! ***')
 
     if args.mode=='train':
-        train()
+        train(env, args.nsteps, xprmt_dir)
     else:
         test(env, args.neps, args.dir)
 
     env.close()
 
-def train():
-    pass
+def train(env, nsteps, xprmt_dir):
+    with tf.Session(config=tf.ConfigProto()) as sess:
+        obfilter = ZFilter(env.observation_space.shape)
+        ob_dim = env.observation_space.shape[0]
+        ac_dim = env.action_space.shape[0]
+
+        with tf.variable_scope("vf"):
+            vf = NeuralNetValueFunction(ob_dim, ac_dim)
+        with tf.variable_scope("pi"):
+            pi = GaussianMlpPolicy(ob_dim, ac_dim)
+
+        saver = tf.train.Saver()
+
+        ## train offline
+        acktr_cont.learn(env,
+                         policy=pi, vf=vf,
+                         rollout=acktr_cont.run_one_episode, obfilter=obfilter,
+                         gamma=0.99, lam=0.97,
+                         batch_size=2500,# in nsteps
+                         max_nsteps=nsteps,
+                         desired_kl=0.002,
+                         animate=False)
+
+        saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
+
+        ## test just after training
+        neps = 100
+        paths = []
+        print("***** immediate testing *****")
+        for ep_idx in range(neps):
+            path = acktr_cont.run_one_episode(env, pi, obfilter, render=False)
+            paths.append(path)
+
+        logger.record_tabular("TestingNEp", len(paths))
+        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        logger.dump_tabular()
+
+        with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f:
+            pickle.dump(obfilter, f)
 
 def test(env, neps, xprmt_dir):
     meta_graph = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
