@@ -15,7 +15,7 @@ from baselines import logger
 from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
 
 from baselines.acktr import acktr_cont
-from baselines.acktr.actor_net_test import GaussianMlpPolicy
+from baselines.acktr.actor_net import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
