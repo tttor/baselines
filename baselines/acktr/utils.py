@@ -8,8 +8,8 @@ def dense(x, size, name, weight_init=None, bias_init=0, weight_loss_dict=None, r
             w = tf.get_variable("w", [x.get_shape()[1], size], initializer=weight_init)
         if (b is None):
             b = tf.get_variable("b", [size], initializer=tf.constant_initializer(bias_init))
-        weight_decay_fc = 3e-4
 
+        weight_decay_fc = 3e-4
         if weight_loss_dict is not None:
             weight_decay = tf.multiply(tf.nn.l2_loss(w), weight_decay_fc, name='weight_decay_loss')
             if weight_loss_dict is not None:
