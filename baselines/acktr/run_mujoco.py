@@ -90,7 +90,7 @@ def train(env, nsteps, xprmt_dir):
         saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
 
         ## test just after training
-        neps = 100
+        neps = 1000
         paths = []
         print("***** immediate testing *****")
         for ep_idx in range(neps):
