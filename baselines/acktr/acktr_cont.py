@@ -96,7 +96,7 @@ def run_one_episode(env, policy, obfilter, render=False):
     ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
     obs = []; acs = []; ac_dists = []; logps = []; rewards = []
-    done = False; step_idx = 0; reached_at_step_idx = env.spec.timestep_limit-1
+    done = False; step_idx = 0; reaching_step_len = env.spec.timestep_limit
 
     while (not done) and (step_idx < env.spec.timestep_limit):
         ## get obs
@@ -119,7 +119,7 @@ def run_one_episode(env, policy, obfilter, render=False):
         rewards.append(rew)
 
         if np.isclose(info['reward_dist'], 0.0, atol=0.01):
-            reached_at_step_idx = step_idx
+            reaching_step_len = step_idx + 1 # +1 as index begins at 0
 
         ## closure
         if render:
@@ -134,5 +134,5 @@ def run_one_episode(env, policy, obfilter, render=False):
 
     return {"observation" : np.array(obs), "reward" : np.array(rewards),
             "action" : np.array(acs), "action_dist": np.array(ac_dists),
-            "reached_at_step_idx": reached_at_step_idx,
+            "reaching_step_len": reaching_step_len,
             "logp" : np.array(logps), "terminated" : done, "length": len(rewards)}
