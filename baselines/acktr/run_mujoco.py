@@ -34,10 +34,13 @@ def main():
         assert args.dir is None
         assert args.nsteps is not None
         xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr', stamp)
-    else:
+    elif args.mode=='test':
         assert args.dir is not None
         assert args.neps is not None
+        assert args.env in args.dir
         xprmt_dir = os.path.join(args.dir, stamp)
+    else:
+        assert False, 'fatal: unknown mode!!!'
     logger.configure(dir=xprmt_dir)
     logger.log('gitCommitSha= %s'%csha)
     logger.log('gitCommitTime= %s'%ctime)
