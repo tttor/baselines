@@ -4,7 +4,7 @@ from baselines.acktr.utils import dense, kl_div
 import baselines.common.tf_util as U
 
 class GaussianMlpPolicy(object):
-    def __init__(self, ob_dim, ac_dim):
+    def __init__(self, ob_dim, ac_dim, graph=None):
         # Here we'll construct a bunch of expressions, which will be used in two places:
         # (1) When sampling actions
         # (2) When computing loss functions, for the policy update
@@ -17,10 +17,19 @@ class GaussianMlpPolicy(object):
         oldac_dist = tf.placeholder(tf.float32, shape=[None, ac_dim*2], name="oldac_dist") # batch of actions: previous action distributions
         adv_n = tf.placeholder(tf.float32, shape=[None], name="adv") # advantage function estimate
 
+        w_h1 = b_h1 = w_h2 = b_h2 = w_mean = b_mean = None
+        if graph is not None:
+            w_h1 = graph.get_tensor_by_name("pi/h1/w:0")
+            b_h1 = graph.get_tensor_by_name("pi/h1/b:0")
+            w_h2 = graph.get_tensor_by_name("pi/h2/w:0")
+            b_h2 = graph.get_tensor_by_name("pi/h2/b:0")
+            w_mean = graph.get_tensor_by_name("pi/mean/w:0")
+            b_mean = graph.get_tensor_by_name("pi/mean/b:0")
+
         wd_dict = {}
-        h1 = tf.nn.tanh(  dense(ob_no, 64, "h1", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict)  )
-        h2 = tf.nn.tanh(  dense(h1, 64, "h2", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict)  )
-        mean_na = dense( h2, ac_dim, "mean", weight_init=U.normc_initializer(0.1), bias_init=0.0, weight_loss_dict=wd_dict ) # Mean control output
+        h1 = tf.nn.tanh(  dense(ob_no, 64, "h1", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w_h1, b_h1)  )
+        h2 = tf.nn.tanh(  dense(h1, 64, "h2", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w_h2, b_h2)  )
+        mean_na = dense( h2, ac_dim, "mean", weight_init=U.normc_initializer(0.1), bias_init=0.0, weight_loss_dict=wd_dict, w_mean, b_mean ) # Mean control output
         self.wd_dict = wd_dict
 
         # Variance on outputs
