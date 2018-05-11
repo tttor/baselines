@@ -17,8 +17,9 @@ class GaussianMlpPolicy(object):
         oldac_dist = tf.placeholder(tf.float32, shape=[None, ac_dim*2], name="oldac_dist") # batch of actions: previous action distributions
         adv_n = tf.placeholder(tf.float32, shape=[None], name="adv") # advantage function estimate
 
-        w_h1 = b_h1 = w_h2 = b_h2 = w_mean = b_mean = None
-        if graph is not None:
+        if graph is None:
+            w_h1 = b_h1 = w_h2 = b_h2 = w_mean = b_mean = None
+        else:
             w_h1 = graph.get_tensor_by_name("pi/h1/w:0")
             b_h1 = graph.get_tensor_by_name("pi/h1/b:0")
             w_h2 = graph.get_tensor_by_name("pi/h2/w:0")
@@ -27,13 +28,16 @@ class GaussianMlpPolicy(object):
             b_mean = graph.get_tensor_by_name("pi/mean/b:0")
 
         wd_dict = {}
-        h1 = tf.nn.tanh(  dense(ob_no, 64, "h1", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w_h1, b_h1)  )
-        h2 = tf.nn.tanh(  dense(h1, 64, "h2", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w_h2, b_h2)  )
-        mean_na = dense( h2, ac_dim, "mean", weight_init=U.normc_initializer(0.1), bias_init=0.0, weight_loss_dict=wd_dict, w_mean, b_mean ) # Mean control output
+        h1 = tf.nn.tanh(  dense(ob_no, 64, "h1", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w=w_h1, b=b_h1)  )
+        h2 = tf.nn.tanh(  dense(h1, 64, "h2", weight_init=U.normc_initializer(1.0), bias_init=0.0, weight_loss_dict=wd_dict, w=w_h2, b=b_h2)  )
+        mean_na = dense( h2, ac_dim, "mean", weight_init=U.normc_initializer(0.1), bias_init=0.0, weight_loss_dict=wd_dict, w=w_mean, b=b_mean ) # Mean control output
         self.wd_dict = wd_dict
 
         # Variance on outputs
-        self.logstd_1a = logstd_1a = tf.get_variable("logstd", [ac_dim], tf.float32, tf.zeros_initializer())
+        if graph is None:
+            self.logstd_1a = logstd_1a = tf.get_variable("logstd", [ac_dim], tf.float32, tf.zeros_initializer())
+        else:
+            self.logstd_1a = logstd_1a = graph.get_tensor_by_name("pi/logstd:0")
         logstd_1a = tf.expand_dims(logstd_1a, 0)
         std_1a = tf.exp(logstd_1a)
         std_na = tf.tile(std_1a, [tf.shape(mean_na)[0], 1])
@@ -62,7 +66,8 @@ class GaussianMlpPolicy(object):
         self.update_info = ((ob_no, oldac_na, adv_n), surr, surr_sampled)
 
         # Initialize uninitialized TF variables
-        U.initialize()
+        if graph is None:
+            U.initialize()
 
     def act(self, ob):
         ac, ac_dist, logp = self._act( ob[np.newaxis,:] )
