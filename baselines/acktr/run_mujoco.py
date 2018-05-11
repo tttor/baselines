@@ -55,7 +55,7 @@ def main():
 
     env = make_mujoco_env(env_id, args.seed)
     os.remove(xml_dst)
-    print('*** env: created! ***')
+    print('***** env: created! *****')
 
     if args.mode=='train':
         train(env, args.nsteps, xprmt_dir)
@@ -92,7 +92,7 @@ def train(env, nsteps, xprmt_dir):
         ## test just after training
         neps = 1000
         paths = []
-        print("***** immediate testing *****")
+        logger.log("***** immediate testing *****")
         for ep_idx in range(neps):
             path = acktr_cont.run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
