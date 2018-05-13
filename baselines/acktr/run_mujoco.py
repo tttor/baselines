@@ -46,21 +46,21 @@ def main():
     logger.log('gitCommitMsg= %s'%cmsg)
     logger.log('seed= %i'%args.seed)
 
+    ## prepare model xml with the correct timestep
     env_id, timestep = args.env.split('@'); assert env_id in args.dir
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
     os.symlink(xml_src, xml_dst)
 
+    ## run!
     env = make_mujoco_env(env_id, args.seed)
     os.remove(xml_dst)
     print('***** env: created! *****')
-
     if args.mode=='train':
         train(env, args.nsteps, xprmt_dir)
     else:
         test(env, args.neps, args.dir)
-
     env.close()
 
 def train(env, nsteps, xprmt_dir):
