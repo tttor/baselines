@@ -19,7 +19,7 @@ from baselines.acktr.actor_net import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
-asset_dir = os.path.join(os.path.expanduser("~"),'ws/gym@tttor/gym/envs/mujoco/assets')
+asset_dir = os.path.join(os.path.expanduser("~"),'ws/gym/gym/envs/mujoco/assets')
 
 def main():
     args = mujoco_arg_parser().parse_args()
