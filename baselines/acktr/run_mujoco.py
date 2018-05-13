@@ -37,7 +37,6 @@ def main():
     elif args.mode=='test':
         assert args.dir is not None
         assert args.neps is not None
-        assert args.env in args.dir
         xprmt_dir = os.path.join(args.dir, stamp)
     else:
         assert False, 'fatal: unknown mode!!!'
@@ -47,7 +46,7 @@ def main():
     logger.log('gitCommitMsg= %s'%cmsg)
     logger.log('seed= %i'%args.seed)
 
-    env_id, timestep = args.env.split('@')
+    env_id, timestep = args.env.split('@'); assert env_id in args.dir
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
