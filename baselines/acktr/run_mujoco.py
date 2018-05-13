@@ -111,7 +111,7 @@ def test(env, neps, xprmt_dir):
             obfilter = pickle.load(f)
 
         with tf.variable_scope("pi"):
-            meta_graph.restore( sess,tf.train.latest_checkpoint(xprmt_dir) )
+            meta_graph.restore( sess,tf.train.latest_checkpoint(checkpoint_dir=xprmt_dir) )
             graph = tf.get_default_graph()
 
             ob_dim = env.observation_space.shape[0]
