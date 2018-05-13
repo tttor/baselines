@@ -19,7 +19,8 @@ from baselines.acktr.actor_net import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 from baselines.acktr.filters import ZFilter
 
-asset_dir = os.path.join(os.path.expanduser("~"),'ws/gym/gym/envs/mujoco/assets')
+home_dir = os.path.expanduser("~")
+asset_dir = os.path.join(home_dir, 'ws/gym/gym/envs/mujoco/assets')
 
 def main():
     args = mujoco_arg_parser().parse_args()
@@ -33,7 +34,7 @@ def main():
     if args.mode=='train':
         assert args.dir is None
         assert args.nsteps is not None
-        xprmt_dir = os.path.join(os.path.expanduser("~"),'xprmt/acktr', stamp)
+        xprmt_dir = os.path.join(home_dir, 'xprmt/acktr', stamp)
     elif args.mode=='test':
         assert args.dir is not None
         assert args.neps is not None
