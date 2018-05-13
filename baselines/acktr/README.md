@@ -9,26 +9,28 @@
 ```python -m baselines.acktr.run_mujoco --env Reacher-v2 --seed 0 --num-timesteps 1000```
 
 ## env setup (Python 3.5.2, 3.6.5)
-* sudo apt-get install python3.6-dev
-* sudo apt-get install libosmesa6-dev
-* add patchef
+* ubuntu setup
 ```
+sudo apt-get install python3.6-dev
+sudo apt-get install libosmesa6-dev
+
 sudo curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf
 sudo chmod +x /usr/local/bin/patchelf
+
+module load mpi/openmpi-x86_64 # To load mpi in goliath cluter
 ```
-* install openai baseline
-```pip install -e .```
-* install openai gym
-```pip install -e '.[mujoco]'```
-* install util
+
+* python setup
 ```
+cd <baseline>
+pip install -e .
+
+cd <gym>
+pip install -e '.[mujoco]'
+
 pip install gitpython
 pip install opencv-python
 ```
-* ref
-  * https://github.com/openai/mujoco-py/issues/47
-  * https://github.com/openai/mujoco-py/issues/96
-  * https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory
 
 ## abbreviation
 * com: center of mass
