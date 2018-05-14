@@ -39,6 +39,22 @@ def main():
         assert args.dir is not None
         assert args.neps is not None
         xprmt_dir = os.path.join(args.dir, stamp)
+        delim = '/xprmt'; ckpt_lines = []
+        ckpt_fpath_src = os.path.join(args.dir, 'checkpoint')
+        with open(ckpt_fpath_src, 'r') as f:
+            for line in f:
+                k, v = line.strip().split(':')
+                ckpt_home_dir, part = [i.strip('"') for i in v.strip().split(delim)]
+                if ckpt_home_dir != home_dir:
+                    xx = os.path.join(home_dir,'xprmt',part)
+                    ckpt_line = k+': '+'"'+os.path.join(home_dir,'xprmt',part)+'"'
+                    ckpt_line = k+': '+'"'+home_dir+delim+part+'"'
+                    ckpt_lines.append(ckpt_line)
+        if len(ckpt_lines) > 0:
+            ckpt_fpath_dst = os.path.join(args.dir, 'checkpoint.ori')
+            os.rename(ckpt_fpath_src, ckpt_fpath_dst)
+            with open(ckpt_fpath_src, 'w') as f:
+                for l in ckpt_lines: f.write(l+'\n')
     else:
         assert False, 'fatal: unknown mode!!!'
     logger.configure(dir=xprmt_dir)
