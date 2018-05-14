@@ -113,7 +113,7 @@ def train(env, nsteps, xprmt_dir):
             path = acktr_cont.run_one_episode(env, pi, obfilter, render=False)
             paths.append(path)
 
-        logger.record_tabular("TestingNEp", len(paths))
+        logger.record_tabular("TestingNEps", len(paths))
         logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
         logger.dump_tabular()
@@ -149,7 +149,7 @@ def test(env, neps, xprmt_dir):
         logger.record_tabular("EpRetMean", np.mean([path["reward"].sum() for path in paths]))
         logger.record_tabular("EpLenMean", np.mean([path["length"] for path in paths]))
         logger.record_tabular("EpReachingStepLenMean", np.mean([path["reaching_step_len"] for path in paths]))
-        logger.record_tabular("NEp", neps)
+        logger.record_tabular("NEps", neps)
         logger.dump_tabular()
 
 if __name__ == "__main__":
