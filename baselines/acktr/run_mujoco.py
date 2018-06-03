@@ -68,6 +68,8 @@ def main():
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
+    try: os.remove(xml_dst)
+    except OSError: pass
     os.symlink(xml_src, xml_dst)
 
     ## run!
