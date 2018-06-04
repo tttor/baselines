@@ -5,14 +5,14 @@
 * summary: https://github.com/tttor/rl-foundation/blob/master/method/actor-critic/acktr_wu_2017.md
 * run: `(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco -h`
 
-## abbreviation
+## abbreviation (mostly used in variable naming)
 * com: center of mass
 * ev: explained variance, see `baselines/common/math_util.py`
 * kl_div: Kullback-Leibler divergence
 * lam: lambda
 * ob_no: observation with dimension 'n x o'?
 * surr: surrogate
-* qr: queue runner
+* qr, q_runner: queue runner
 * wd_dict: weight data dictionary
 
 ## acktr facts
@@ -39,6 +39,9 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 * multi-threading is for optimization (network operations), not for rollout
   * https://www.tensorflow.org/api_docs/python/tf/train/QueueRunner
   * https://www.tensorflow.org/api_docs/python/tf/train/Coordinator
+* observation filter is crucial!
+  * `y = (x-mean)/std`
+    using running estimates of mean,std
 
 ## question
 * global seed?
