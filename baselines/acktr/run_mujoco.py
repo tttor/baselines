@@ -13,11 +13,11 @@ import tensorflow as tf
 
 from baselines import logger
 from baselines.common.cmd_util import make_mujoco_env, arg_parser
+from baselines.common.filters import ZFilter
 
 from baselines.acktr import acktr_cont
 from baselines.acktr.actor_net import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
-from baselines.acktr.filters import ZFilter
 
 home_dir = os.path.expanduser("~")
 asset_dir = os.path.join(home_dir, 'ws/gym/gym/envs/mujoco/assets')
