@@ -81,3 +81,45 @@ pip install gitpython
 pip install opencv-python
 ```
 
+## tested perf
+* nsteps= 500K
+```
+gitCommitSha= 2382c77b942e1ab61180ef3f3b5e8c1c49cd9f13
+gitCommitTime= Sun Jun 10 13:40:28 2018
+gitCommitMsg= fix
+seed= 0
+***** training batch_idx= 199 *****
+kl just right!
+------------------------------------
+| EVAfter           | 0.964        |
+| EVBefore          | 0.962        |
+| TotalNsteps       | 500000       |
+| TrainingEpLenMean | 50           |
+| TrainingEpRewMean | -4.87        |
+| TrainingKL        | 0.0012952603 |
+------------------------------------
+***** immediate testing *****
+-------------------------------
+| TestingEpLenMean | 50       |
+| TestingEpRewMean | -5.08    |
+| TestingNEps      | 100      |
+-------------------------------
+```
+
+* nsteps= 400K
+```sh
+gitCommitSha= 5224d66fcaff1f7db2a94d60856896840b7fc70d
+gitCommitTime= Mon May  7 12:00:31 2018
+gitCommitMsg= ob filter init in main
+...
+********** training batch_idx= 159 ************
+kl too high
+-----------------------------------
+| EVAfter           | 0.938       |
+| EVBefore          | 0.928       |
+| TrainingEpLenMean | 50          |
+| TrainingEpRewMean | -5.96       |
+| TrainingKL        | 0.004674497 |
+-----------------------------------
+
+```
