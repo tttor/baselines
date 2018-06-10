@@ -6,7 +6,6 @@ import tensorflow as tf
 import baselines.common as common
 from baselines import logger
 from baselines.common import tf_util as U
-
 from baselines.acktr import kfac
 
 def learn(env, policy, vf, rollout, obfilter, gamma, lam,
