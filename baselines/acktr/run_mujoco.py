@@ -31,14 +31,11 @@ def main():
     hostname = socket.gethostname(); hostname = hostname.split('.')[0]
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     stamp = '_'.join(['acktr',args.mode,args.env,hostname,timestamp])
+    xprmt_dir = os.path.join(args.dir, stamp)
     if args.mode=='train':
-        assert args.dir is None
         assert args.nsteps is not None
-        xprmt_dir = os.path.join(home_dir, 'xprmt/acktr', stamp)
     elif args.mode=='test':
-        assert args.dir is not None
         assert args.neps is not None
-        xprmt_dir = os.path.join(args.dir, stamp)
         delim = '/xprmt'; ckpt_lines = []
         ckpt_fpath_src = os.path.join(args.dir, 'checkpoint')
         with open(ckpt_fpath_src, 'r') as f:
@@ -64,7 +61,7 @@ def main():
 
     ## prepare model xml with the correct timestep
     env_id, timestep = args.env.split('@')
-    if args.dir is not None: assert env_id in args.dir
+    if args.mode=='test': assert env_id in args.dir
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
