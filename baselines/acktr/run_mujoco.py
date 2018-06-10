@@ -46,7 +46,6 @@ def main():
                 k, v = line.strip().split(':')
                 ckpt_home_dir, part = [i.strip('"') for i in v.strip().split(delim)]
                 if ckpt_home_dir != home_dir:
-                    xx = os.path.join(home_dir,'xprmt',part)
                     ckpt_line = k+': '+'"'+os.path.join(home_dir,'xprmt',part)+'"'
                     ckpt_line = k+': '+'"'+home_dir+delim+part+'"'
                     ckpt_lines.append(ckpt_line)
