@@ -5,7 +5,7 @@ import tensorflow as tf
 
 import baselines.common as common
 from baselines import logger
-from baselines.common import tf_util as U
+from baselines.common import tf_util
 from baselines.acktr import kfac
 
 def learn(env, policy, vf, rollout, obfilter, gamma, lam,
@@ -17,8 +17,8 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
     pi_vars = [var for var in tf.trainable_variables() if 'pi' in var.name]
     inputs, loss, loss_sampled = policy.update_info
     update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
-    do_update = U.function(inputs, update_op)
-    U.initialize()
+    do_update = tf_util.function(inputs, update_op)
+    tf_util.initialize()
 
     # start queue runners
     enqueue_threads = []
