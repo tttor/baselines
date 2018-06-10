@@ -61,13 +61,13 @@ sudo apt-get install libosmesa6-dev
 
 sudo curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf
 sudo chmod +x /usr/local/bin/patchelf
-
-module load mpi/openmpi-x86_64 # To load mpi in goliath cluter
 ```
 
 * python setup
 ```
-cd <baseline>
+module load mpi/openmpi-x86_64 # load mpi in goliath cluster
+
+cd <baselines>
 pip install -e .
 
 cd <gym>
