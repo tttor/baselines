@@ -90,8 +90,6 @@ def train(env, nsteps, xprmt_dir):
         with tf.variable_scope("pi"):
             pi = GaussianMlpPolicy(ob_dim, ac_dim)
 
-        saver = tf.train.Saver()
-
         ## train offline
         acktr_cont.learn(env,
                          policy=pi, vf=vf,
@@ -102,6 +100,7 @@ def train(env, nsteps, xprmt_dir):
                          desired_kl=0.002,
                          animate=False)
 
+        saver = tf.train.Saver()
         saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
 
         ## test just after training
