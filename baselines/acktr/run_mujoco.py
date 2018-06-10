@@ -12,7 +12,7 @@ import numpy as np
 import tensorflow as tf
 
 from baselines import logger
-from baselines.common.cmd_util import make_mujoco_env, mujoco_arg_parser
+from baselines.common.cmd_util import make_mujoco_env, arg_parser
 
 from baselines.acktr import acktr_cont
 from baselines.acktr.actor_net import GaussianMlpPolicy
@@ -23,7 +23,7 @@ home_dir = os.path.expanduser("~")
 asset_dir = os.path.join(home_dir, 'ws/gym/gym/envs/mujoco/assets')
 
 def main():
-    args = mujoco_arg_parser().parse_args()
+    args = acktr_arg_parser().parse_args()
     repo = git.Repo(search_parent_directories=True)
     csha = repo.head.object.hexsha
     ctime = time.asctime(time.localtime(repo.head.object.committed_date))
@@ -150,6 +150,19 @@ def test(env, neps, xprmt_dir):
         logger.record_tabular("EpReachingStepLenMean", np.mean([path["reaching_step_len"] for path in paths]))
         logger.record_tabular("NEps", neps)
         logger.dump_tabular()
+
+def acktr_arg_parser():
+    """
+    Create an argparse.ArgumentParser for run_mujoco.py.
+    """
+    parser = arg_parser()
+    parser.add_argument('--mode', help='mode', type=str, choices=['train','test'], default=None, required=True)
+    parser.add_argument('--env', help='environment ID', type=str, default=None, required=True)
+    parser.add_argument('--seed', help='RNG seed', type=int, default=None, required=True)
+    parser.add_argument('--dir', help='(xprmt) dir', type=str, default=None, required=True)
+    parser.add_argument('--nsteps', help='nsteps', type=int, default=None)
+    parser.add_argument('--neps', help='num of episodes', type=int, default=None)
+    return parser
 
 if __name__ == "__main__":
     main()
