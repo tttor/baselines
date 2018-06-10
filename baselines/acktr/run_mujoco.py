@@ -64,7 +64,8 @@ def main():
     logger.log('seed= %i'%args.seed)
 
     ## prepare model xml with the correct timestep
-    env_id, timestep = args.env.split('@'); assert env_id in args.dir
+    env_id, timestep = args.env.split('@')
+    if args.dir is not None: assert env_id in args.dir
     bare_env_id = env_id.lower().replace('-v2','')
     xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
     xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
@@ -108,7 +109,7 @@ def train(env, nsteps, xprmt_dir):
         saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
 
         ## test just after training
-        neps = 1000
+        neps = 100
         paths = []
         logger.log("***** immediate testing *****")
         for ep_idx in range(neps):
