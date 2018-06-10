@@ -3,7 +3,11 @@
 * Original paper: https://arxiv.org/abs/1708.05144
 * Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
 * summary: https://github.com/tttor/rl-foundation/blob/master/method/actor-critic/acktr_wu_2017.md
-* run: `(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco -h`
+* run: 
+```
+(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco -h
+(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/xprmt-acktr
+```
 
 ## abbreviation (mostly used in variable naming)
 * com: center of mass
