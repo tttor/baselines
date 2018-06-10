@@ -1,9 +1,7 @@
 # ACKTR
 
-* Original paper: https://arxiv.org/abs/1708.05144
-* Baselines blog post: https://blog.openai.com/baselines-acktr-a2c/
-* summary: https://github.com/tttor/rl-foundation/blob/master/method/actor-critic/acktr_wu_2017.md
-* run: 
+* https://github.com/tttor/rl-foundation/blob/master/method/actor-critic/acktr_wu_2017.md
+* run:
 ```
 (baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco -h
 (baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/xprmt-acktr
@@ -23,13 +21,8 @@
 * policy network: Gaussian MLP
 * value network: MLP (fully connected, dense)
   * https://www.tensorflow.org/api_docs/python/tf/nn/elu
-* is this learning under various init state (jpos, target pose?
+* is this learning under various init state (jpos, target pose)?
   * ans: yes, reset() is called at every rollout()
-  * reacher: to always have the same initial joint pos and target pose?
-    * diff seed make diff target pose,
-      ~~but still not init jointpos~~ and init jointpos
-    * however, init jointpos random in only from range [-0.1, +0.1) rad,
-      which is small, ~5.72 deg
 * loss vs loss_sampled?
   * ans: loss = surr
 ```
