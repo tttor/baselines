@@ -8,8 +8,11 @@
 ```
 
 ## acktr facts
-* policy network: Gaussian MLP
-* value network: MLP (fully connected, dense)
+* actor/policy network
+  * Gaussian MLP
+* critic/value network:
+  * MLP (fully connected, dense)
+  * predict Advantage values, not Q values
   * https://www.tensorflow.org/api_docs/python/tf/nn/elu
 * is this learning under various init state (jpos, target pose)?
   * ans: yes, reset() is called at every rollout()
@@ -29,6 +32,7 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 * observation filter is crucial!
   * `y = (x-mean)/std`
     using running estimates of mean,std
+* kfac for both actor and critic, see `learn()` and `critic_net`
 
 ## question
 * global seed?
@@ -39,12 +43,6 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
   * seed=0 does not mean using time as seed
     * https://stackoverflow.com/questions/21494489/what-does-numpy-random-seed0-do
     * numpy.random.seed() causes numpy to set the seed to a random number obtained from /dev/urandom
-* kfac for both actor and critic (as stated in the paper)?
-  * but:
-```py
-def learn():
-update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
-```
 
 ## abbreviation (mostly used in variable naming)
 * com: center of mass
