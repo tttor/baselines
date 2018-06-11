@@ -7,16 +7,6 @@
 (baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/xprmt-acktr
 ```
 
-## abbreviation (mostly used in variable naming)
-* com: center of mass
-* ev: explained variance, see `baselines/common/math_util.py`
-* kl_div: Kullback-Leibler divergence
-* lam: lambda
-* ob_no: observation with dimension 'n x o'?
-* surr: surrogate
-* qr, q_runner: queue runner
-* wd_dict: weight data dictionary
-
 ## acktr facts
 * policy network: Gaussian MLP
 * value network: MLP (fully connected, dense)
@@ -39,6 +29,16 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
 * observation filter is crucial!
   * `y = (x-mean)/std`
     using running estimates of mean,std
+
+## abbreviation (mostly used in variable naming)
+* com: center of mass
+* ev: explained variance, see `baselines/common/math_util.py`
+* kl_div: Kullback-Leibler divergence
+* lam: lambda
+* ob_no: observation with dimension 'n x o'?
+* surr: surrogate
+* qr, q_runner: queue runner
+* wd_dict: weight data dictionary
 
 ## question
 * global seed?
@@ -75,7 +75,7 @@ pip install opencv-python
 ```
 
 ## tested perf
-* nsteps= 500K
+* Reacher-v2@010: nsteps= 500K
 ```
 gitCommitSha= 2382c77b942e1ab61180ef3f3b5e8c1c49cd9f13
 gitCommitTime= Sun Jun 10 13:40:28 2018
@@ -99,7 +99,7 @@ kl just right!
 -------------------------------
 ```
 
-* nsteps= 400K
+* Reacher-v2@010: nsteps= 400K
 ```sh
 gitCommitSha= 5224d66fcaff1f7db2a94d60856896840b7fc70d
 gitCommitTime= Mon May  7 12:00:31 2018
