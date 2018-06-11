@@ -15,7 +15,7 @@ def learn():
 ```
 * break down input X for vf.predict(), dim= `n x 28`
   * observation, dim= `n x 22`
-  * act, dim= `n x 4`
+  * act_dist, dim= `n x 4`
   * ? al?, dim= `n x 1`
   * bias: ones, dim = `n x 1`
 ```py

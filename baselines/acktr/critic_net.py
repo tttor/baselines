@@ -35,8 +35,10 @@ class NeuralNetValueFunction(object):
     def _preproc(self, path):
         l = path["reward"].shape[0]
         al = np.arange(l).reshape(-1,1)/10.0
-        act = path["action_dist"].astype('float32')
-        X = np.concatenate([path['observation'], act, al, np.ones((l, 1))], axis=1)
+        X = np.concatenate([ path['observation'],
+                             path["action_dist"].astype('float32'),
+                             al, np.ones((l, 1)) ],
+                            axis=1)
         return X
 
     def predict(self, path):
