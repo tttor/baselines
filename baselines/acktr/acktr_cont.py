@@ -10,12 +10,13 @@ from baselines.acktr import kfac
 
 def learn(env, policy, vf, rollout, obfilter, gamma, lam,
           batch_size, max_nsteps, desired_kl=0.002, animate=False):
+    # init
+    inputs, loss, loss_sampled = policy.update_info
+    pi_vars = [var for var in tf.trainable_variables() if 'pi' in var.name]
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize? not lr
     optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
                                epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
                                weight_decay_dict=policy.wd_dict, max_grad_norm=None)
-    pi_vars = [var for var in tf.trainable_variables() if 'pi' in var.name]
-    inputs, loss, loss_sampled = policy.update_info
     update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
     do_update = tf_util.function(inputs, update_op)
     tf_util.initialize()
@@ -27,6 +28,7 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         assert (qr != None)
         enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
+    # learning
     batch_idx = 0; total_nsteps = 0
     while total_nsteps < max_nsteps:
         logger.log("***** training batch_idx= %i *****"%batch_idx)

@@ -30,16 +30,6 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
   * `y = (x-mean)/std`
     using running estimates of mean,std
 
-## abbreviation (mostly used in variable naming)
-* com: center of mass
-* ev: explained variance, see `baselines/common/math_util.py`
-* kl_div: Kullback-Leibler divergence
-* lam: lambda
-* ob_no: observation with dimension 'n x o'?
-* surr: surrogate
-* qr, q_runner: queue runner
-* wd_dict: weight data dictionary
-
 ## question
 * global seed?
   * seed passed to `make_mujoco_env(args.env, args.seed)`
@@ -49,6 +39,22 @@ surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
   * seed=0 does not mean using time as seed
     * https://stackoverflow.com/questions/21494489/what-does-numpy-random-seed0-do
     * numpy.random.seed() causes numpy to set the seed to a random number obtained from /dev/urandom
+* kfac for both actor and critic (as stated in the paper)?
+  * but:
+```py
+def learn():
+update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
+```
+
+## abbreviation (mostly used in variable naming)
+* com: center of mass
+* ev: explained variance, see `baselines/common/math_util.py`
+* kl_div: Kullback-Leibler divergence
+* lam: lambda
+* ob_no: observation with dimension 'n x o'?
+* surr: surrogate
+* qr, q_runner: queue runner
+* wd_dict: weight data dictionary
 
 ## env setup (Python 3.5.2, 3.6.5)
 * ubuntu setup
