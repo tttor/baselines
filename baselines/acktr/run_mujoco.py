@@ -19,14 +19,14 @@ from baselines.acktr.actor_net import GaussianMlpPolicy
 from baselines.acktr.critic_net import NeuralNetValueFunction
 
 home_dir = os.path.expanduser("~")
-asset_dir = os.path.join(home_dir, 'ws/gym/gym/envs/mujoco/assets')
+baselines_dir = os.path.join(home_dir, 'ws/baselines')
+gym_dir = os.path.join(home_dir, 'ws/gym')
+gym_asset_dir = os.path.join(home_dir, gym_dir, 'gym/envs/mujoco/assets')
 
 def main():
     args = acktr_arg_parser().parse_args()
-    repo = git.Repo(search_parent_directories=True)
-    csha = repo.head.object.hexsha
-    ctime = time.asctime(time.localtime(repo.head.object.committed_date))
-    cmsg = repo.head.object.message.strip()
+    baselines_repo = git.Repo(path=baselines_dir)
+    gym_repo = git.Repo(path=gym_dir)
     hostname = socket.gethostname(); hostname = hostname.split('.')[0]
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     stamp = '_'.join(['acktr',args.mode,args.env,hostname,timestamp])
@@ -53,17 +53,20 @@ def main():
     else:
         assert False, 'fatal: unknown mode!!!'
     logger.configure(dir=xprmt_dir)
-    logger.log('gitCommitSha= %s'%csha)
-    logger.log('gitCommitTime= %s'%ctime)
-    logger.log('gitCommitMsg= %s'%cmsg)
+    logger.log('baselines_gitCommitSha= %s'%baselines_repo.head.object.hexsha)
+    logger.log('baselines_gitCommitTime= %s'%time.asctime(time.localtime(baselines_repo.head.object.committed_date)))
+    logger.log('baselines_gitCommitMsg= %s'%baselines_repo.head.object.message.strip())
+    logger.log('gym_gitCommitSha= %s'%gym_repo.head.object.hexsha)
+    logger.log('gym_gitCommitTime= %s'%time.asctime(time.localtime(gym_repo.head.object.committed_date)))
+    logger.log('gym_gitCommitMsg= %s'%gym_repo.head.object.message.strip())
     logger.log('seed= %i'%args.seed)
 
     ## prepare model xml with the correct timestep
     env_id, timestep = args.env.split('@')
     if args.mode=='test': assert env_id in args.dir
     bare_env_id = env_id.lower().replace('-v2','')
-    xml_src = os.path.join(asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
-    xml_dst = os.path.join(asset_dir,bare_env_id+str('.xml'))
+    xml_src = os.path.join(gym_asset_dir,bare_env_id,bare_env_id+str('.xml')+'@'+timestep)
+    xml_dst = os.path.join(gym_asset_dir,bare_env_id+str('.xml'))
     try: os.remove(xml_dst)
     except OSError: pass
     os.symlink(xml_src, xml_dst)
