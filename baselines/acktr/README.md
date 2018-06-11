@@ -8,6 +8,27 @@
 ```
 
 ## question
+* lambda in
+```py
+def learn():
+  adv_t = common.discount(delta_t, gamma * lam)
+```
+* break down input X for vf.predict(), dim= `n x 28`
+  * observation, dim= `n x 22`
+  * act, dim= `n x 4`
+  * ? al?, dim= `n x 1`
+  * bias: ones, dim = `n x 1`
+```py
+def _preproc(self, path):
+    l = path["reward"].shape[0]
+    al = np.arange(l).reshape(-1,1)/10.0
+    act = path["action_dist"].astype('float32')
+    X = np.concatenate([path['observation'], act, al, np.ones((l, 1))], axis=1)
+    return X
+
+def predict(self, path):
+    return self._predict(self._preproc(path))
+```
 * global seed?
   * seed passed to `make_mujoco_env(args.env, args.seed)`
     indeed control the randomness of environment
