@@ -7,33 +7,6 @@
 (baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/xprmt-acktr
 ```
 
-## acktr facts
-* actor/policy network
-  * Gaussian MLP
-* critic/value network:
-  * MLP (fully connected, dense)
-  * predict Advantage values, not Q values
-  * https://www.tensorflow.org/api_docs/python/tf/nn/elu
-* is this learning under various init state (jpos, target pose)?
-  * ans: yes, reset() is called at every rollout()
-* loss vs loss_sampled?
-  * ans: loss = surr
-```
-surr = - tf.reduce_mean(adv_n * logprob_n)
-surr_sampled = - tf.reduce_mean(logprob_n) # Sampled loss of the policy
-```
-* kfac
-  * baselines/acktr/kfac.py
-  * https://www.tensorflow.org/api_docs/python/tf/contrib/kfac/optimizer/KfacOptimizer
-  * https://arxiv.org/abs/1503.05671
-* multi-threading is for optimization (network operations), not for rollout
-  * https://www.tensorflow.org/api_docs/python/tf/train/QueueRunner
-  * https://www.tensorflow.org/api_docs/python/tf/train/Coordinator
-* observation filter is crucial!
-  * `y = (x-mean)/std`
-    using running estimates of mean,std
-* kfac for both actor and critic, see `learn()` and `critic_net`
-
 ## question
 * global seed?
   * seed passed to `make_mujoco_env(args.env, args.seed)`
