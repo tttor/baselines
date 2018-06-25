@@ -8,6 +8,8 @@
 ```
 
 ## question
+* how policy update work?
+  how these args are used: `(obs, acs, standardized_advs)` in `do_update(...)`?
 * lambda in
 ```py
 def learn():
