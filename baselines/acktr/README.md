@@ -4,13 +4,44 @@
 * run:
 ```
 (baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco -h
-(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/xprmt-acktr
+(baseline) tor@l7480:~/ws/baselines$ python -m baselines.acktr.run_mujoco --mode train  --env Reacher-v2@010 --nsteps 1000 --seed 0 --dir ~/xprmt/openai-baselines-acktr
 ```
 
-## question
+# arch, hyperparam
+## actor, policy network
+
+## critic, valuefn network
+* input_dim= 28
+  * observation, dim= `n x 22`
+  * act_dist, dim= `n x 4`
+  * ? al?, dim= `n x 1`
+  * bias: ones, dim = `n x 1`
+* activ-fn
+  * elu - elu - dense
+* n unit
+  * 64 - 64 - 1
+* weight init
+  * custom: normc_initializer;
+    /home/tor/ws/baselines/baselines/common/tf_util.py
+* bias init
+  * zeroed!
+* loss
+  * not really MSE:
+  `loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)`
+* update
+  * nepoch=25 per batch
+  `for _ in range(25): self.do_update(X, y)`
+
+## psi
+
+## env
+* use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
+
+# question
 * how policy update work?
-  how these args are used: `(obs, acs, standardized_advs)` in `do_update(...)`?
-* lambda in
+  how these args are used in `do_update(...)`:
+  `(obs, acs, standardized_advs)` ?
+* lambda? is it related to generalized advantage estimation (GAE)?
 ```py
 def learn():
   adv_t = common.discount(delta_t, gamma * lam)
@@ -36,11 +67,11 @@ def predict(self, path):
     indeed control the randomness of environment
     * plus make_mujoco_env() calls `set_global_seeds()`
     * but this does not result in the same final result, why not?
-  * seed=0 does not mean using time as seed
+  * seed=0 does NOT mean using time as seed
     * https://stackoverflow.com/questions/21494489/what-does-numpy-random-seed0-do
     * numpy.random.seed() causes numpy to set the seed to a random number obtained from /dev/urandom
 
-## abbreviation (mostly used in variable naming)
+# abbreviation (mostly used in variable naming)
 * com: center of mass
 * ev: explained variance, see `baselines/common/math_util.py`
 * kl_div: Kullback-Leibler divergence
@@ -50,7 +81,7 @@ def predict(self, path):
 * qr, q_runner: queue runner
 * wd_dict: weight data dictionary
 
-## env setup (Python 3.5.2, 3.6.5)
+# env setup (Python 3.5.2, 3.6.5)
 * ubuntu setup
 ```
 sudo apt-get install python3.6-dev
@@ -74,7 +105,7 @@ pip install gitpython
 pip install opencv-python
 ```
 
-## tested perf
+# tested perf
 * Reacher-v2@010: nsteps= 500K
 ```
 gitCommitSha= 2382c77b942e1ab61180ef3f3b5e8c1c49cd9f13
