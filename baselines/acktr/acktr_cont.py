@@ -115,6 +115,7 @@ def run_one_episode(env, policy, obfilter, render=False):
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
 
         print('=====================')
+        print('step_idx=', step_idx)
         print('concat_ob=', concat_ob)
         print('ac=', ac)
         print('scaled_ac=', scaled_ac)

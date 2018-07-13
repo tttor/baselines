@@ -71,4 +71,7 @@ class GaussianMlpPolicy(object):
 
     def act(self, ob):
         ac, ac_dist, logp = self._act( ob[np.newaxis,:] )
+        assert ac_dist.shape[0]==1
+        assert logp.shape[0]==1
+        assert ac.shape[0]==1
         return ac[0], ac_dist[0], logp[0]
