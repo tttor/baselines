@@ -9,6 +9,14 @@
 
 # arch, hyperparam
 ## actor, policy network
+* named: gaussian mlp
+* activ fn
+  * tanh - tanh - linear
+* weight init
+  * custom: normc_initializer;
+    /home/tor/ws/baselines/baselines/common/tf_util.py
+* bias init
+  * zeroed!
 
 ## critic, valuefn network
 * input_dim= 28

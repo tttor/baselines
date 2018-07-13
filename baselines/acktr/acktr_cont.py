@@ -114,6 +114,15 @@ def run_one_episode(env, policy, obfilter, render=False):
         scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
 
+        print('=====================')
+        print('concat_ob=', concat_ob)
+        print('ac=', ac)
+        print('scaled_ac=', scaled_ac)
+        print('ac_dist=', ac_dist)
+        print('logp=', logp)
+        if step_idx==2:
+            exit()
+
         ## step
         ob, rew, done, info = env.step(scaled_ac)
         ob = obfilter(ob)

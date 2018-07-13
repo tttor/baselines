@@ -105,21 +105,21 @@ def train(env, nsteps, xprmt_dir):
         saver = tf.train.Saver()
         saver.save(sess, os.path.join(xprmt_dir,'training_acktr_reacher'))
 
-        ## test just after training
-        neps = 100
-        paths = []
-        logger.log("***** immediate testing *****")
-        for ep_idx in range(neps):
-            path = acktr_cont.run_one_episode(env, pi, obfilter, render=False)
-            paths.append(path)
+        # ## test just after training
+        # neps = 100
+        # paths = []
+        # logger.log("***** immediate testing *****")
+        # for ep_idx in range(neps):
+        #     path = acktr_cont.run_one_episode(env, pi, obfilter, render=False)
+        #     paths.append(path)
 
-        logger.record_tabular("TestingNEps", len(paths))
-        logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
-        logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
-        logger.dump_tabular()
+        # logger.record_tabular("TestingNEps", len(paths))
+        # logger.record_tabular("TestingEpRewMean", np.mean([path["reward"].sum() for path in paths]))
+        # logger.record_tabular("TestingEpLenMean", np.mean([path["length"] for path in paths]))
+        # logger.dump_tabular()
 
-        with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f:
-            pickle.dump(obfilter, f)
+        # with open(os.path.join(xprmt_dir,'obfilter.pkl'), 'wb') as f:
+        #     pickle.dump(obfilter, f)
 
 def test(env, neps, xprmt_dir):
     meta_graph = tf.train.import_meta_graph( os.path.join(xprmt_dir,'training_acktr_reacher.meta') )
