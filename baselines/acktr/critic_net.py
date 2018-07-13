@@ -33,6 +33,7 @@ class NeuralNetValueFunction(object):
         U.initialize() # Initialize uninitialized TF variables
 
     def _preproc(self, path):
+        assert path['reward'].shape[0]==path['observation'].shape[0]
         l = path["reward"].shape[0]
         al = np.arange(l).reshape(-1,1)/10.0
         X = np.concatenate([ path['observation'],
