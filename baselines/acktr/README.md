@@ -18,6 +18,8 @@
   * NOTE: output weight, std=0.1
 * bias init
   * zeroed!
+* way to sample action is not by forming a distrib with mean and std, but
+`sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_dim:] + ac_dist[:,:ac_dim] # This is the sampled action we'll perform.`
 
 ## critic, valuefn network
 * input_dim= 28
@@ -47,6 +49,7 @@
 
 ## env
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
+* use double: float64
 
 # question
 * how policy update work?
