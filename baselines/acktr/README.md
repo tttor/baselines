@@ -20,6 +20,7 @@
   * zeroed!
 * way to sample action is not by forming a distrib with mean and std, but
 `sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_dim:] + ac_dist[:,:ac_dim] # This is the sampled action we'll perform.`
+* use weight decay! in dense()
 
 ## critic, valuefn network
 * input_dim= 28
@@ -45,6 +46,9 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 * update
   * nepoch=25 per batch
   `for _ in range(25): self.do_update(X, y)`
+
+* optim learning rate
+  * adjusted based on KL-div
 
 ## agent param
 * gamma=0.99, lam=0.97,
@@ -96,7 +100,7 @@ def predict(self, path):
 * ob_no: observation with dimension 'n x o'?
 * surr: surrogate
 * qr, q_runner: queue runner
-* wd_dict: weight data dictionary
+* wd_dict: weight decay dictionary
 
 # env setup (Python 3.5.2, 3.6.5)
 * ubuntu setup
