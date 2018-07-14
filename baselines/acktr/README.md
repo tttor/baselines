@@ -37,8 +37,11 @@
 * bias init
   * zeroed!
 * loss
-  * not really MSE:
-  `loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)`
+  * not really MSE, what is ws_loss
+```
+wd_loss = tf.get_collection("vf_losses", None)
+loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
+```
 * update
   * nepoch=25 per batch
   `for _ in range(25): self.do_update(X, y)`

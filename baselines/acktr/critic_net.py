@@ -18,7 +18,7 @@ class NeuralNetValueFunction(object):
         sample_vpred_n = vpred_n + tf.random_normal(tf.shape(vpred_n))
 
         wd_loss = tf.get_collection("vf_losses", None)
-        loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
+        loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) #+ tf.add_n(wd_loss)
         loss_sampled = tf.reduce_mean(tf.square(vpred_n - tf.stop_gradient(sample_vpred_n)))
         self._predict = U.function([X], vpred_n)
 
