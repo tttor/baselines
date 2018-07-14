@@ -9,6 +9,7 @@
 
 # arch, hyperparam
 ## actor, policy network
+* input
 * named: gaussian mlp
 * activ fn
   * tanh - tanh - linear
@@ -19,7 +20,9 @@
 * bias init
   * zeroed!
 * way to sample action is not by forming a distrib with mean and std, but
-`sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_dim:] + ac_dist[:,:ac_dim] # This is the sampled action we'll perform.`
+```py
+sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_dim:] + ac_dist[:,:ac_dim] # This is the sampled action we'll perform.
+```
 * use weight decay! in dense()
 
 ## critic, valuefn network
@@ -38,8 +41,8 @@
 * bias init
   * zeroed!
 * loss
-  * not really MSE, what is ws_loss
-```
+  * not really MSE, what is wd_loss (weight decay loss)?
+```py
 wd_loss = tf.get_collection("vf_losses", None)
 loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 ```
