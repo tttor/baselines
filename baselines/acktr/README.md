@@ -15,6 +15,7 @@
 * weight init
   * custom: normc_initializer;
     /home/tor/ws/baselines/baselines/common/tf_util.py
+  * NOTE: output weight, std=0.1
 * bias init
   * zeroed!
 
@@ -40,7 +41,9 @@
   * nepoch=25 per batch
   `for _ in range(25): self.do_update(X, y)`
 
-## psi
+## agent param
+* gamma=0.99, lam=0.97,
+* psi
 
 ## env
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
