@@ -119,16 +119,17 @@ def run_one_episode(env, policy, obfilter, render=False):
         ob = obfilter(ob)
         rewards.append(rew)
 
-        print('=====================')
-        print('step_idx=', step_idx)
-        print('concat_ob=', concat_ob)
-        print('ac=', ac)
-        print('scaled_ac=', scaled_ac)
-        print('ac_dist=', ac_dist)
-        print('logp=', logp)
-        print('rew=', rew)
-        if step_idx==30:
-            exit()
+        # print('=====================')
+        # print('step_idx=', step_idx)
+        # print('concat_ob=', concat_ob)
+        # print('ac=', ac)
+        # print('scaled_ac=', scaled_ac)
+        # print('ac_dist=', ac_dist)
+        # print('logp=', logp)
+        # print('rew=', rew)
+        # if step_idx==15:
+        #     np.savetxt("foo.csv", np.asarray(acs), delimiter=",")
+        #     exit()
 
         if np.isclose(info['reward_dist'], 0.0, atol=0.01):
             reaching_step_len = step_idx + 1 # +1 as index begins at 0

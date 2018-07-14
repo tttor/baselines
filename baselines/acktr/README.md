@@ -50,7 +50,7 @@
 ## env
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
 * use double: float64
-
+* scale action for act(), but use non-scale action for policy update
 # question
 * how policy update work?
   how these args are used in `do_update(...)`:
