@@ -95,7 +95,7 @@ def run_one_episode(env, policy, obfilter, render=False):
     ob = env.reset()
     ob = obfilter(ob)
     prev_ob = np.float32(np.zeros(ob.shape))
-    obs = []; acs = []; ac_dists = []; logps = []; rewards = []
+    obs = []; acs = []; ac_dists = []; rewards = [] #; logps = []
     done = False; step_idx = 0; reaching_step_len = env.spec.timestep_limit
 
     while (not done) and (step_idx < env.spec.timestep_limit):
@@ -108,7 +108,7 @@ def run_one_episode(env, policy, obfilter, render=False):
         ac, ac_dist, logp = policy.act(concat_ob)
         acs.append(ac)
         ac_dists.append(ac_dist)
-        logps.append(logp)
+        # logps.append(logp)
 
         scaled_ac = env.action_space.low + (ac + 1.) * 0.5 * (env.action_space.high - env.action_space.low)
         scaled_ac = np.clip(scaled_ac, env.action_space.low, env.action_space.high)
@@ -146,5 +146,5 @@ def run_one_episode(env, policy, obfilter, render=False):
 
     return {"observation" : np.array(obs), "reward" : np.array(rewards),
             "action" : np.array(acs), "action_dist": np.array(ac_dists),
-            "reaching_step_len": reaching_step_len,
-            "logp" : np.array(logps), "terminated" : done, "length": len(rewards)}
+            "reaching_step_len": reaching_step_len, # "logp" : np.array(logps),
+            "terminated" : done, "length": len(rewards)}
