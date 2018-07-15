@@ -25,6 +25,11 @@ sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_di
 ```
 * use weight decay! in dense()
 * batch size: 2500 step
+* input for policynet update
+  * (ob_no, oldac_na, adv_n)
+* output:
+  * loss
+  * loss_sampled
 
 ## critic, valuefn network
 * input_dim= 28
@@ -50,6 +55,9 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 * update
   * nepoch=25 per batch
   `for _ in range(25): self.do_update(X, y)`
+
+## optim
+* kfac for acktr
 * optim learning rate
   * adjusted based on KL-div
 
