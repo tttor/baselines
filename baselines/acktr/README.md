@@ -56,6 +56,12 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 ## agent param
 * gamma=0.99, lam=0.97,
 * psi
+```
+vpred_t = vf.predict(path)
+vpred_t = np.append(vpred_t, 0.0 if path["terminated"] else vpred_t[-1])
+delta_t = (rew_t + gamma*vpred_t[1:]) - vpred_t[:-1]
+adv_t = common.discount(delta_t, gamma * lam)
+```
 
 ## env
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
