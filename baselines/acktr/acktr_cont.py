@@ -57,17 +57,16 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         # Update value-function network
         vf.fit(paths, returns)
 
-        # Build arrays for policy update
+        # Update policy network
         obs = np.concatenate([path["observation"] for path in paths])
         acs = np.concatenate([path["action"] for path in paths])
-        ac_dists = np.concatenate([path["action_dist"] for path in paths])
         advs = np.concatenate(advs)
         standardized_advs = (advs - advs.mean()) / (advs.std() + 1e-8)
 
-        # Update policy network
         do_update(obs, acs, standardized_advs)
 
         # Adjust lr
+        ac_dists = np.concatenate([path["action_dist"] for path in paths])
         min_lr = np.float32(1e-8)
         max_lr = np.float32(1e0)
         kl = policy.compute_kl(obs, ac_dists)

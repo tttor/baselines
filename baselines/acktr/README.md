@@ -24,6 +24,7 @@
 sampled_ac_na = tf.random_normal(tf.shape(ac_dist[:,ac_dim:])) * ac_dist[:,ac_dim:] + ac_dist[:,:ac_dim] # This is the sampled action we'll perform.
 ```
 * use weight decay! in dense()
+* batch size: 2500 step
 
 ## critic, valuefn network
 * input_dim= 28
@@ -49,7 +50,6 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 * update
   * nepoch=25 per batch
   `for _ in range(25): self.do_update(X, y)`
-
 * optim learning rate
   * adjusted based on KL-div
 
@@ -61,6 +61,9 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
 * use double: float64
 * scale action for act(), but use non-scale action for policy update
+* env mujoco timestep = 0.010s = 10ms
+* one single env for rollout
+
 # question
 * how policy update work?
   how these args are used in `do_update(...)`:
