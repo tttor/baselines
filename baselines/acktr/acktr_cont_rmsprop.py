@@ -14,22 +14,10 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
     inputs, loss, loss_sampled = policy.update_info
     pi_vars = [var for var in tf.trainable_variables() if 'pi' in var.name]
     lr = tf.Variable(initial_value=np.float32(np.array(0.03)), name='stepsize') # why name stepsize? not lr
-    # optim = kfac.KfacOptimizer(learning_rate=lr, cold_lr=lr*(1-0.9), momentum=0.9, kfac_update=2,
-    #                            epsilon=1e-2, stats_decay=0.99, async=1, cold_iter=1,
-    #                            weight_decay_dict=policy.wd_dict, max_grad_norm=None)
-    # update_op, q_runner = optim.minimize(loss, loss_sampled, var_list=pi_vars)
-    # update_op, q_runner = optim.minimize(loss, var_list=pi_vars)
     optim = tf.train.RMSPropOptimizer(learning_rate=0.03)
     update_op = optim.minimize(loss, var_list=pi_vars)
     do_update = tf_util.function(inputs, update_op)
     tf_util.initialize()
-
-    # # start queue runners
-    # enqueue_threads = []
-    # coord = tf.train.Coordinator()
-    # for qr in [q_runner, vf.q_runner]:
-    #     assert (qr != None)
-    #     enqueue_threads.extend( qr.create_threads(tf.get_default_session(), coord=coord, start=True) )
 
     # learning
     batch_idx = 0; total_nsteps = 0
@@ -90,9 +78,6 @@ def learn(env, policy, vf, rollout, obfilter, gamma, lam,
         logger.record_tabular("TotalNsteps", total_nsteps)
         logger.dump_tabular()
         batch_idx += 1
-
-    # coord.request_stop()
-    # coord.join(enqueue_threads) # Wait for all the threads to terminate.
 
 def run_one_episode(env, policy, obfilter, render=False):
     ob = env.reset()
