@@ -63,6 +63,9 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 
 ## agent param
 * gamma=0.99, lam=0.97,
+  * `adv_t = common.discount(delta_t, gamma * lam)`
+  * lambda here is for GAE, 
+    when `lambda=1` then it is equal to return minus pred_state_value, see equ 18 in the GAE paper
 * psi
 ```
 vpred_t = vf.predict(path)
@@ -70,7 +73,6 @@ vpred_t = np.append(vpred_t, 0.0 if path["terminated"] else vpred_t[-1])
 delta_t = (rew_t + gamma*vpred_t[1:]) - vpred_t[:-1]
 adv_t = common.discount(delta_t, gamma * lam)
 ```
-
 ## env
 * use Monitor from /home/tor/ws/baselines/baselines/bench/monitor.py
 * use double: float64
@@ -82,11 +84,6 @@ adv_t = common.discount(delta_t, gamma * lam)
 * how policy update work?
   how these args are used in `do_update(...)`:
   `(obs, acs, standardized_advs)` ?
-* lambda? is it related to generalized advantage estimation (GAE)?
-```py
-def learn():
-  adv_t = common.discount(delta_t, gamma * lam)
-```
 * break down input X for vf.predict(), dim= `n x 28`
   * observation, dim= `n x 22`
   * act_dist, dim= `n x 4`
