@@ -65,7 +65,7 @@ loss = tf.reduce_mean(tf.square(vpred_n - vtarg_n)) + tf.add_n(wd_loss)
 * gamma=0.99, lam=0.97,
   * `adv_t = common.discount(delta_t, gamma * lam)`
   * lambda here is for GAE, 
-    when `lambda=1` then it is equal to return minus pred_state_value, see equ 18 in the GAE paper
+    * when `lambda=1` then it is equal to return minus pred_state_value, see equ 18 in the GAE paper
 * psi
 ```
 vpred_t = vf.predict(path)
