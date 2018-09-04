@@ -6,6 +6,9 @@ if [ "$#" -ne 1 ]; then
 fi
 env_id=${1}
 
+source ~/venv/baselines/bin/activate
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mjpro150/bin
+
 python -m baselines.run \
 --env=$env_id \
 --seed=12 \
